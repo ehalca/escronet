@@ -1,0 +1,22 @@
+{
+  "name": "escronet",
+  "private": true,
+  "version": "0.1.0",
+  "description": "On-device scam call prevention platform (React Native + NestJS)",
+  "packageManager": "pnpm@9.12.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "pnpm --filter @escronet/backend start:dev",
+    "build:backend": "pnpm --filter @escronet/backend build",
+    "start:backend": "pnpm --filter @escronet/backend start",
+    "dev:mobile": "pnpm --filter @escronet/mobile start",
+    "android": "pnpm --filter @escronet/mobile android",
+    "emulator": "pnpm --filter @escronet/mobile emulator",
+    "dev:android": "pnpm --filter @escronet/mobile dev:android",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

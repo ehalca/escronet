@@ -1,0 +1,7 @@
+{
+    "nuxt.isNuxtApp": false,
+    "kotlin.languageServer.enabled": true,
+    "kotlin.gradle.enabled": true,
+    "kotlin.compiler.jvm.target": "17",
+    "kotlin.languageServer.path": ""
+}
