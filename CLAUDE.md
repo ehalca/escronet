@@ -44,4 +44,5 @@ cd apps/mobile/android && ./gradlew app:compileDebugKotlin
 - [Mobile app](docs/mobile.md) — component contracts, native module interfaces, platform conventions
 - [Call Processor](docs/call-processor.md) — background service risk-level handling and backend events
 - [Analyzer](docs/analyzer.md) — audio chunk pipeline, language support, scam categories, Guardian service emission
+- [Guardian Service](docs/guardian.md) — event processor for blocking calls, local alerts, and GUARDIAN notifications
 - [Backend](docs/backend.md) — NestJS modules, tRPC, database, FCM
