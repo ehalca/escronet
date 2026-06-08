@@ -9,7 +9,9 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@escronet/shared": ["./packages/shared/src/index.ts"],
-      "@escronet/shared/*": ["./packages/shared/src/*"]
+      "@escronet/shared/*": ["./packages/shared/src/*"],
+      "@escronet/shared-ui": ["./packages/shared-ui/src/index.ts"],
+      "@escronet/shared-ui/*": ["./packages/shared-ui/src/*"]
     }
   }
 }

@@ -1,0 +1,28 @@
+{
+  "name": "@escronet/shared-ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@gluestack-ui/core": "^3.0.0",
+    "@gluestack-ui/utils": "^3.0.0"
+  },
+  "peerDependencies": {
+    "nativewind": "^4.0.0",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "nativewind": "^4.0.36",
+    "react": "18.3.1",
+    "react-native": "0.76.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.2"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"No lint configured for shared-ui\""
+  }
+}

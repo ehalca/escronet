@@ -1,7 +1,15 @@
 const { spawn, spawnSync } = require("child_process");
+const path = require("path");
 
 const ANDROID_HOME = "C:\\Android\\Sdk";
-const env = { ...process.env, ANDROID_HOME };
+// NODE_PATH is inherited by every child process (npx → react-native CLI → Gradle → RNGP).
+// Without it, react-native/cli.js runs from the pnpm virtual store and can't resolve
+// @react-native-community/cli, so `react-native config` returns empty output and autolinking fails.
+const NODE_PATH = [
+  path.join(__dirname, "..", "node_modules"),
+  path.join(__dirname, "..", "..", "..", "node_modules"),
+].join(path.delimiter);
+const env = { ...process.env, ANDROID_HOME, NODE_PATH };
 
 // Kill anything already on Metro's port
 spawnSync(

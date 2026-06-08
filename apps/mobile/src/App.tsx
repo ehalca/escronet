@@ -1,12 +1,12 @@
 import notifee, { AndroidImportance } from "@notifee/react-native";
 import React from "react";
+import { SafeAreaView, StatusBar, Text, View } from "react-native";
 import {
-  SafeAreaView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+  Button,
+  ButtonText,
+  GluestackProvider,
+  Heading,
+} from "@escronet/shared-ui";
 
 async function testNotification(): Promise<void> {
   try {
@@ -15,13 +15,12 @@ async function testNotification(): Promise<void> {
       name: "Test",
       importance: AndroidImportance.HIGH,
     });
-    const id = await notifee.displayNotification({
+    await notifee.displayNotification({
       id: `test_${Date.now()}`,
       title: "Test notification",
       body: "Notifee is working",
       android: { channelId, importance: AndroidImportance.HIGH },
     });
-    console.log("[Test] Notification posted, id:", id);
   } catch (err) {
     console.error("[Test] Failed:", err);
   }
@@ -29,36 +28,32 @@ async function testNotification(): Promise<void> {
 
 export function App(): React.JSX.Element {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0D1B2A" }}>
-      <StatusBar barStyle="light-content" backgroundColor="#0D1B2A" />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 24,
-          gap: 24,
-        }}
-      >
-        <Text
-          style={{ color: "#E0E1DD", fontSize: 28, fontWeight: "700" }}
-        >
-          Escronet
-        </Text>
-        <TouchableOpacity
-          onPress={testNotification}
+    <GluestackProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#0D1B2A" }}>
+        <StatusBar barStyle="light-content" backgroundColor="#0D1B2A" />
+        <View
           style={{
-            backgroundColor: "#1B4F72",
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-            borderRadius: 8,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 24,
+            gap: 24,
           }}
         >
-          <Text style={{ color: "#E0E1DD", fontSize: 16 }}>
-            Test Notification
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <Text style={{ color: "white" }}>jora</Text>
+          <Heading size="xl" className="text-white">
+            Escronet 22
+          </Heading>
+          <Button
+            onPress={testNotification}
+            variant="solid"
+            action="negative"
+            className="border-2 border-white text-white"
+          >
+            <ButtonText>Test Notification 2</ButtonText>
+          </Button>
+        </View>
+      </SafeAreaView>
+    </GluestackProvider>
   );
 }

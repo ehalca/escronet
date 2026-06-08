@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-native start",
+    "start": "node scripts/start.js",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "emulator": "C:\\Android\\Sdk\\emulator\\emulator.exe -avd Pixel_7_API_35 -gpu host",
@@ -12,14 +12,18 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@escronet/shared-ui": "workspace:*",
     "@notifee/react-native": "^9.0.0",
     "@op-engineering/op-sqlite": "^12.0.2",
+    "nativewind": "^4.0.36",
     "onnxruntime-react-native": "^1.20.0",
     "react": "18.3.1",
     "react-native": "0.76.3",
     "react-native-callkeep": "^4.3.16",
+    "react-native-mmkv": "^2.12.2",
     "react-native-quick-crypto": "^0.7.12",
-    "react-native-mmkv": "^2.12.2"
+    "react-native-reanimated": "3.16.7",
+    "react-native-safe-area-context": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -32,6 +36,8 @@
     "@react-native/metro-config": "0.76.3",
     "@react-native/typescript-config": "0.76.3",
     "@types/react": "^18.3.5",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.6.2"
   },
   "engines": {
