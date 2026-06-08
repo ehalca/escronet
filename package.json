@@ -9,6 +9,8 @@
     "packages/*"
   ],
   "scripts": {
+    "dev:frontend": "pnpm --filter @escronet/frontend dev",
+    "build:frontend": "pnpm --filter @escronet/frontend build",
     "dev:backend": "pnpm --filter @escronet/backend start:dev",
     "build:backend": "pnpm --filter @escronet/backend build",
     "start:backend": "pnpm --filter @escronet/backend start",
