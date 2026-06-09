@@ -153,3 +153,6 @@ apps/mobile/.expo/
 
 # Backend artifacts
 apps/backend/dist/
+
+# Production secrets — provision manually on the server, never commit
+prod.env

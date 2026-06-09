@@ -44,7 +44,7 @@ Triggered by the Background service when the Call Processor determines the call 
    > Action: **Unblock**
 
 3. Emit `CALL_BLOCKED` to backend (payload: caller number hash, timestamp).
-4. Backend notifies GUARDIAN via FCM if one is configured.
+4. Backend records the alert; GUARDIAN notification requires a push provider (not yet configured).
 
 **If USER taps Unblock:**
 

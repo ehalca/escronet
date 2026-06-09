@@ -14,7 +14,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@escronet/shared": ["../../packages/shared/src/index.ts"],
-      "@escronet/shared/*": ["../../packages/shared/src/*"]
+      "@escronet/shared/*": ["../../packages/shared/src/*"],
+      "@escronet/shared-ui/web": ["../../packages/shared-ui/src/web/index.ts"]
     }
   },
   "include": [

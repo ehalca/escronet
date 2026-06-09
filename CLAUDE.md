@@ -35,6 +35,26 @@ cd apps/mobile/android && ./gradlew app:compileDebugKotlin
 
 **pnpm only**: This is a pnpm workspace. Running `npm install` will corrupt the lockfile.
 
+## Code conventions
+
+- file naming: ex: `{keyword}.{type}.ts` - `base.entity.ts`, `user.service.ts`, `auth.controller.ts`
+
+## Entities
+
+All entities should extend from `BaseEntity` in `apps/backend/src/entities/base.entity.ts` to ensure consistent ID and timestamp fields.
+All entities should have a corresponding repository in `apps/backend/src/repositories/` that extends `BaseRepository` for common DB operations.
+All entities must have a corresponding service in `apps/backend/src/modules/` that implements business logic and is injected into controllers for API handling.
+All entities must be registered in the `TypeOrmModule` imports of `apps/backend/src/app.module.ts` to be recognized by TypeORM.
+All entities must have a corresponding zod schema in `packages/shared/src/schemas/` for validation and type inference across the codebase and these schemas should be used in the tRPC router for input validation and output typing to ensure consistency and type safety across the application.
+All entities must have a implementing interface that will be used for type safety across the codebase. For example, `User` entity should have a corresponding `IUser` interface in `packages/shared/src/interfaces/`, all these interfaces should be inferred from the zod schema to ensure consistency.
+
+## tRPC
+
+All API routes must be defined in `apps/backend/src/trpc/routers/` and mounted in `apps/backend/src/trpc/mount-trpc.ts`.
+All API routes must have input validation and output typing using zod schemas defined in `packages/shared/src/schemas/` to ensure consistency and type safety across the application.
+All API routes must be implemented in the corresponding service in `apps/backend/src/modules/` to separate business logic from API handling
+All tRPC handlers must implement entry point functions with only 1 paramater (input) due to limitations in the tRPC router.
+
 ## Reference docs
 
 - [Architecture & data flow](docs/architecture.md) — system design, call detection pipeline, current build state

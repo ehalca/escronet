@@ -143,22 +143,22 @@ Same `status` field on `ScamReportEntity` required (shared with MEDIUM).
 Requires: all conditions from HIGH, plus the following action having been taken.
 
 ### Triggering conditions (signals)
-- A `BLOCK` (alert) notification has been successfully dispatched to the user's designated contact via FCM push notification.
+- An alert notification has been successfully dispatched to the user's designated contact via a push provider.
 
 ### System response
-- The designated contact receives a FCM push notification: "Your contact may be on a scam call".
-- Backend logs the FCM dispatch against the alert record.
+- The designated contact receives a push notification: "Your contact may be on a scam call".
+- Backend logs the dispatch against the alert record.
 - The user's in-app notification is updated to confirm that the designated contact has been reached.
 - No further escalation is possible.
 
 ### Data sources
-- `designated_contacts` table — resolved to FCM token for push delivery.
+- `designated_contacts` table — resolved to a push token for delivery.
 - `scam_alerts` table — the triggering HIGH-level alert.
-- FCM delivery receipt from `FcmService`.
 
 ### Open questions
-- Delivery confirmation: FCM does not guarantee delivery. Should HIGHEST only be set on confirmed FCM receipt, or on dispatch attempt?
-- What happens if the designated contact has no registered device / FCM token?
+- Push provider: Firebase FCM has been removed; a replacement (e.g. Expo Push, self-hosted Ntfy) must be integrated before HIGHEST can fire.
+- Delivery confirmation: push does not guarantee delivery. Should HIGHEST only be set on confirmed receipt, or on dispatch attempt?
+- What happens if the designated contact has no registered device / push token?
 - Should the user be able to silence HIGHEST escalation (i.e., opt out of alerting their designated contact)?
 
 ---
@@ -173,7 +173,7 @@ Requires: all conditions from HIGH, plus the following action having been taken.
 | Number in `scam_reports` with `UNVERIFIED` status | MEDIUM | Backend `scam_reports` (synced or queried) |
 | Number in `scam_reports` with `VERIFIED` status | HIGH | Backend `scam_reports` (synced or queried) |
 | Classifier score >= `HIGH_CLASSIFIER_THRESHOLD` | HIGH | On-device ONNX `ClassifierModule` |
-| FCM dispatch to designated contact confirmed | HIGHEST | Backend `FcmService` |
+| Push dispatch to designated contact confirmed | HIGHEST | Backend push service (provider TBD) |
 
 ---
 

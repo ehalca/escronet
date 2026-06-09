@@ -14,7 +14,7 @@ apps/backend/src/
 │   ├── scam-number.entity.ts
 │   └── scam-report.entity.ts
 ├── modules/
-│   ├── alerts/                   ← POST /alerts, FCM forwarding
+│   ├── alerts/                   ← POST /alerts
 │   ├── auth/                     ← OTP request/verify, JWT issue
 │   ├── contacts/                 ← PUT /contacts/designated
 │   └── scam-numbers/             ← GET /scam-numbers/delta, POST report
@@ -29,7 +29,7 @@ apps/backend/src/
 |---|---|---|---|
 | POST | `/auth/request-otp` | None | Send SMS OTP to phone number |
 | POST | `/auth/verify-otp` | None | Verify OTP, return JWT |
-| POST | `/alerts` | JWT | Upload scam alert, trigger FCM to designated contacts |
+| POST | `/alerts` | JWT | Upload scam alert |
 | PUT | `/contacts/designated` | JWT | Set/update designated contact |
 | GET | `/scam-numbers/delta` | None | Fetch scam hashes updated since timestamp |
 | POST | `/scam-numbers/report` | JWT | Report a number as scam |
@@ -45,10 +45,6 @@ tRPC routes are mounted at `/trpc` and currently expose `health.ping` and the au
 5. Client stores JWT in MMKV; attaches as `Authorization: Bearer <token>` on subsequent requests
 
 Open decisions: SMS provider, JWT algorithm (HS256 vs RS256), OTP storage (in-memory Map vs Redis). See [PLAN.md](../PLAN.md#open-decisions).
-
-## FCM
-
-`alerts/fcm.service.ts` sends push notifications to designated contacts when an alert is posted. FCM credentials are loaded from environment variables. The mobile client does not yet handle incoming FCM data messages.
 
 ## Database
 
@@ -68,5 +64,4 @@ pnpm --filter @escronet/shared build
 Copy `apps/backend/.env.example` to `apps/backend/.env`. Required variables:
 - `DATABASE_URL` — PostgreSQL connection string
 - `JWT_SECRET` — secret for signing tokens
-- `FCM_*` — Firebase credentials
 - `TWILIO_*` (or equivalent) — SMS provider credentials

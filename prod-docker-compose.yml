@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: escronet
+      POSTGRES_DB: escronet
+    volumes:
+      - ~/escronet/postgres:/var/lib/postgresql/data
+    env_file:
+      - ~/escronet/prod.env
+
+  backend:
+    image: escronet/backend:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: escronet
+      DB_NAME: escronet
+      NODE_ENV: production
+    env_file:
+      - ~/escronet/prod.env
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  frontend:
+    image: escronet/frontend:latest
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+    env_file:
+      - ~/escronet/prod.env
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ~/escronet/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ~/escronet/certbot/www:/var/www/certbot:ro
+      - ~/escronet/certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+      - frontend
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ~/escronet/certbot/www:/var/www/certbot
+      - ~/escronet/certbot/conf:/etc/letsencrypt
+    entrypoint: >
+      sh -c "trap exit TERM;
+             while :; do
+               certbot renew --webroot -w /var/www/certbot --quiet;
+               sleep 12h & wait $${!};
+             done"
+
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --label-enable
+    environment:
+      WATCHTOWER_CLEANUP: "true"

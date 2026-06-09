@@ -1,15 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@source "../../../../packages/shared-ui/src/web/**/*.{ts,tsx}";
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Gluestack design tokens */
+  --color-primary-50:  rgb(250 250 250);
+  --color-primary-100: rgb(244 244 244);
+  --color-primary-500: rgb(23 23 23);
+  --color-primary-600: rgb(15 15 15);
+  --color-secondary-500: rgb(82 82 82);
+  --color-secondary-600: rgb(58 58 58);
+  --color-success-500: rgb(22 163 74);
+  --color-success-700: rgb(15 99 48);
+  --color-error-500: rgb(239 68 68);
+  --color-error-700: rgb(185 28 28);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {

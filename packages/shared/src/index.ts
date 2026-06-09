@@ -1,3 +1,5 @@
+export { RiskLevel } from "./enums/risk-level.enum";
+
 export type ScamNumberDeltaRecord = {
   phoneHash: string;
   confidence: number;
@@ -14,5 +16,18 @@ export type ScamAlertEvent = {
   detectedAt: string;
 };
 
-export type { AppRouter, AuthRouterHandlers } from "./trpc/app-router.js";
-export { createAppRouter } from "./trpc/app-router.js";
+export {
+  CallerDeltaRecordSchema,
+  CallerDeltaQuerySchema,
+} from "./schemas/caller.schema";
+export type {
+  CallerDeltaRecord,
+  CallerDeltaQuery,
+} from "./schemas/caller.schema";
+
+export type {
+  AppRouter,
+  AuthRouterHandlers,
+  CallerRouterHandlers,
+} from "./trpc/app-router";
+export { createAppRouter } from "./trpc/app-router";

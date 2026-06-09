@@ -18,7 +18,12 @@
     "android": "pnpm --filter @escronet/mobile android",
     "emulator": "pnpm --filter @escronet/mobile emulator",
     "dev:android": "pnpm --filter @escronet/mobile dev:android",
+    "dev": "docker compose -f local-docker-compose.yml up -d && concurrently -n shared,backend,frontend -c cyan,blue,green \"pnpm dev:shared\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+    "dev:shared": "pnpm --filter @escronet/shared dev:types",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
   }
 }

@@ -1,0 +1,26 @@
+version: "3.9"
+
+# Run once to obtain the initial TLS certificate.
+# After the cert is issued, use prod-docker-compose.yml for all subsequent starts.
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ~/escronet/nginx/conf.d/app-certonly.conf:/etc/nginx/conf.d/default.conf:ro
+      - ~/escronet/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ~/escronet/certbot/www:/var/www/certbot
+      - ~/escronet/certbot/conf:/etc/letsencrypt
+    command: >
+      certonly --webroot
+      -w /var/www/certbot
+      -d example.com
+      --email admin@example.com
+      --agree-tos
+      --no-eff-email
