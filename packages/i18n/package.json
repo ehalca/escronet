@@ -1,0 +1,20 @@
+{
+  "name": "@escronet/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./mobile": "./src/mobile.ts",
+    "./web": "./src/web.ts"
+  },
+  "peerDependencies": {
+    "i18next": ">=23",
+    "react-i18next": ">=14"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"No lint configured\""
+  }
+}

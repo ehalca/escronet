@@ -7,32 +7,13 @@ apps/backend/src/
 ├── main.ts                       ← bootstrap, port 3000
 ├── app.module.ts                 ← root module, TypeORM connection
 ├── common/
-│   └── hash.util.ts              ← E.164 normalization + SHA-256
 ├── entities/
-│   ├── alert.entity.ts
-│   ├── designated-contact.entity.ts
-│   ├── scam-number.entity.ts
-│   └── scam-report.entity.ts
+│
 ├── modules/
-│   ├── alerts/                   ← POST /alerts
-│   ├── auth/                     ← OTP request/verify, JWT issue
-│   ├── contacts/                 ← PUT /contacts/designated
-│   └── scam-numbers/             ← GET /scam-numbers/delta, POST report
 └── trpc/
     ├── trpc.ts                   ← tRPC init
     └── mount-trpc.ts             ← mounts tRPC under /trpc
 ```
-
-## API surface
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/auth/request-otp` | None | Send SMS OTP to phone number |
-| POST | `/auth/verify-otp` | None | Verify OTP, return JWT |
-| POST | `/alerts` | JWT | Upload scam alert |
-| PUT | `/contacts/designated` | JWT | Set/update designated contact |
-| GET | `/scam-numbers/delta` | None | Fetch scam hashes updated since timestamp |
-| POST | `/scam-numbers/report` | JWT | Report a number as scam |
 
 tRPC routes are mounted at `/trpc` and currently expose `health.ping` and the auth procedures.
 
@@ -55,6 +36,7 @@ For local development: `docker-compose up -d` starts PostgreSQL on port 5432.
 ## Shared types
 
 The tRPC router type is exported from `packages/shared`. The mobile app imports it for type-safe API calls. After changing the router:
+
 ```bash
 pnpm --filter @escronet/shared build
 ```
@@ -62,6 +44,7 @@ pnpm --filter @escronet/shared build
 ## Environment
 
 Copy `apps/backend/.env.example` to `apps/backend/.env`. Required variables:
+
 - `DATABASE_URL` — PostgreSQL connection string
 - `JWT_SECRET` — secret for signing tokens
 - `TWILIO_*` (or equivalent) — SMS provider credentials

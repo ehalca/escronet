@@ -1,5 +1,5 @@
 import { open } from "@op-engineering/op-sqlite";
-import type { CallerDeltaRecord } from "@escronet/shared/src/schemas/caller.schema";
+import type { CallerDeltaRecord } from "@escronet/shared";
 
 const db = open({ name: "escronet.db" });
 

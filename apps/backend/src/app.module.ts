@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Caller } from "./entities/caller.entity";
 import { Guardian } from "./entities/guardian.entity";
 import { User } from "./entities/user.entity";
+import { AuthModule } from "./modules/auth/auth.module";
 import { CallersModule } from "./modules/callers/callers.module";
 
 @Module({
@@ -20,10 +21,11 @@ import { CallersModule } from "./modules/callers/callers.module";
         username: config.get<string>("DB_USER", "escronet"),
         password: config.get<string>("DB_PASSWORD", "escronet"),
         database: config.get<string>("DB_NAME", "escronet"),
-        synchronize: false,
+        synchronize: true,
         entities: [Caller, Guardian, User],
       }),
     }),
+    AuthModule,
     CallersModule,
   ],
 })

@@ -66,3 +66,7 @@ All tRPC handlers must implement entry point functions with only 1 paramater (in
 - [Analyzer](docs/analyzer.md) — audio chunk pipeline, language support, scam categories, Guardian service emission
 - [Guardian Service](docs/guardian.md) — event processor for blocking calls, local alerts, and GUARDIAN notifications
 - [Backend](docs/backend.md) — NestJS modules, tRPC, database, FCM
+
+#UI
+
+Apps (frontend and mobile) should be localized in 3 languages: English, Romanian and Russian. All user-facing strings must be extracted into i18n JSON files in `apps/mobile/src/i18n/` and accessed via the `t` function from `react-i18next`. See [docs/mobile.md](docs/mobile.md) for React Native i18n conventions.

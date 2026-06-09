@@ -11,7 +11,10 @@
       "@escronet/shared": ["./packages/shared/src/index.ts"],
       "@escronet/shared/*": ["./packages/shared/src/*"],
       "@escronet/shared-ui": ["./packages/shared-ui/src/index.ts"],
-      "@escronet/shared-ui/*": ["./packages/shared-ui/src/*"]
+      "@escronet/shared-ui/*": ["./packages/shared-ui/src/*"],
+      "@escronet/i18n": ["./packages/i18n/src/index.ts"],
+      "@escronet/i18n/mobile": ["./packages/i18n/src/mobile.ts"],
+      "@escronet/i18n/web": ["./packages/i18n/src/web.ts"]
     }
   }
 }

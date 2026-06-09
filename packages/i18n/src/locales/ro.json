@@ -1,0 +1,34 @@
+{
+  "tabs": {
+    "home": "Acasă",
+    "alerts": "Alerte",
+    "settings": "Setări"
+  },
+  "home": {
+    "protectionActive": "Protecție Activă",
+    "protectionDisabled": "Protecție Dezactivată",
+    "protectionActiveSubtitle": "Monitorizând apelurile primite pentru activitate frauduloasă",
+    "protectionDisabledSubtitle": "Activați protecția pentru a filtra apelurile",
+    "lastSync": "Ultima sincronizare",
+    "never": "Niciodată"
+  },
+  "alerts": {
+    "title": "Alerte",
+    "emptyTitle": "Nicio alertă deocamdată",
+    "emptySubtitle": "Apelurile frauduloase detectate vor apărea aici"
+  },
+  "settings": {
+    "title": "Setări",
+    "sectionProtection": "Protecție",
+    "sectionAccount": "Cont",
+    "guardianSetup": "Configurare Guardian",
+    "guardianSetupSubtitle": "Nominalizați un contact de încredere pentru a primi alerte",
+    "deviceId": "ID dispozitiv"
+  },
+  "guardian": {
+    "title": "Guardian",
+    "headerTitle": "Configurare Guardian",
+    "noGuardian": "Niciun guardian conectat",
+    "noGuardianBody": "Un guardian primește alerte când un apel fraudulos de risc înalt este detectat pe dispozitivul dvs. Configurarea guardianului va fi disponibilă într-o versiune viitoare."
+  }
+}

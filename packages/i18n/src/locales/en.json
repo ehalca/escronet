@@ -1,0 +1,34 @@
+{
+  "tabs": {
+    "home": "Home",
+    "alerts": "Alerts",
+    "settings": "Settings"
+  },
+  "home": {
+    "protectionActive": "Protection Active",
+    "protectionDisabled": "Protection Disabled",
+    "protectionActiveSubtitle": "Monitoring incoming calls for scam activity",
+    "protectionDisabledSubtitle": "Enable protection to screen calls",
+    "lastSync": "Last sync",
+    "never": "Never"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "emptyTitle": "No alerts yet",
+    "emptySubtitle": "Detected scam calls will appear here"
+  },
+  "settings": {
+    "title": "Settings",
+    "sectionProtection": "Protection",
+    "sectionAccount": "Account",
+    "guardianSetup": "Guardian Setup",
+    "guardianSetupSubtitle": "Nominate a trusted contact to receive alerts",
+    "deviceId": "Device ID"
+  },
+  "guardian": {
+    "title": "Guardian",
+    "headerTitle": "Guardian Setup",
+    "noGuardian": "No guardian linked",
+    "noGuardianBody": "A guardian receives alerts when a high-risk scam call is detected on your device. Guardian setup will be available in an upcoming release."
+  }
+}

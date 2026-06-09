@@ -1,4 +1,9 @@
 export { RiskLevel } from "./enums/risk-level.enum";
+export {
+  RegisterDeviceInputSchema,
+  AuthTokenSchema,
+} from "./schemas/auth.schema";
+export type { RegisterDeviceInput, AuthToken } from "./schemas/auth.schema";
 
 export type ScamNumberDeltaRecord = {
   phoneHash: string;
