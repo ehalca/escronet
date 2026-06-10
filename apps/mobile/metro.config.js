@@ -37,7 +37,7 @@ const config = {
   transformer: {
     // @gluestack-ui and nativewind ship TS sources alongside compiled ESM — transform them
     transformIgnorePatterns: [
-      'node_modules/(?!(@gluestack-ui|nativewind|react-native-reanimated|@escronet)/)',
+      'node_modules/(?!(@gluestack-ui|nativewind|react-native-reanimated|@escronet|@trpc)/)',
     ],
   },
 };

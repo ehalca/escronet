@@ -1,4 +1,4 @@
-import { trpc } from "../api/trpc";
+import { api } from "../api/api";
 import {
   getDeviceId,
   getToken,
@@ -10,7 +10,7 @@ export async function ensureAuthenticated(): Promise<void> {
   if (getToken()) return;
 
   const deviceId = getDeviceId();
-  const { token, userId } = await trpc.auth.register.mutate({ deviceId });
+  const { token, userId } = await api.auth.register({ deviceId });
 
   setToken(token);
   setUserId(userId);

@@ -1,11 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import type { LinkingOptions } from "@react-navigation/native";
 import { View, ActivityIndicator } from "react-native";
 import type { RootStackParamList } from "./types";
 import { TabNavigator } from "./TabNavigator";
 import { ensureAuthenticated } from "../services/authService";
 import { initMigration, syncIfStale } from "../services/migrationService";
+
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: ["escronet://", "https://escro.net"],
+  config: {
+    screens: {
+      MainTabs: {
+        screens: {
+          Settings: {
+            screens: {
+              Guardian: {
+                path: "link",
+                parse: { code: (v: string) => v.toUpperCase() },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,14 +50,21 @@ export function AppNavigator(): React.JSX.Element {
 
   if (!ready) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0D1B2A" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#0D1B2A",
+        }}
+      >
         <ActivityIndicator size="large" color="#4FC3F7" />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="MainTabs" component={TabNavigator} />
       </Stack.Navigator>

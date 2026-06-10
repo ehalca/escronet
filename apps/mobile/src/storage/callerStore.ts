@@ -43,6 +43,20 @@ export async function upsertCaller(record: CallerDeltaRecord): Promise<void> {
   );
 }
 
+export async function getAllCallers(): Promise<CallerDeltaRecord[]> {
+  const result = await db.execute(
+    "SELECT * FROM callers WHERE delete_at IS NULL ORDER BY updated_at DESC",
+  );
+  return (result.rows ?? []).map((row) => ({
+    id: row["id"] as string,
+    phoneNumber: row["phone_number"] as string,
+    riskLevel: row["risk_level"] as import("@escronet/shared").RiskLevel,
+    createdAt: row["created_at"] as string,
+    updatedAt: row["updated_at"] as string,
+    deleteAt: (row["delete_at"] as string | null) ?? null,
+  }));
+}
+
 export async function lookupCallerByPhone(
   phoneNumber: string,
 ): Promise<CallerDeltaRecord | null> {

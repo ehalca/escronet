@@ -43,7 +43,7 @@ Runs Next.js dev server on `http://localhost:3001`.
 ```
                         ┌──────────────────────────────────┐
 Internet ──► Nginx :443 │  /        → frontend :3001       │
-                        │  /api/*   → backend  :3000        │
+                        │  /api/*   → backend  :3000       │
                         └──────────────────────────────────┘
                         Watchtower auto-updates both images
                         Certbot renews TLS certificates
@@ -90,8 +90,8 @@ nano ~/escronet/prod.env  # fill in real values
 
 Each service has its own Dockerfile at its workspace root. Images are built and pushed to Docker Hub by GitHub Actions on every push to `main`. Configure `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` in GitHub repo secrets.
 
-| Service  | Dockerfile                                           | Image                      |
-| -------- | ---------------------------------------------------- | -------------------------- |
+| Service  | Dockerfile                                              | Image                      |
+| -------- | ------------------------------------------------------- | -------------------------- |
 | Backend  | [apps/backend/Dockerfile](../apps/backend/Dockerfile)   | `escronet/backend:latest`  |
 | Frontend | [apps/frontend/Dockerfile](../apps/frontend/Dockerfile) | `escronet/frontend:latest` |
 
@@ -99,11 +99,11 @@ CI/CD workflow: [.github/workflows/deploy.yml](../.github/workflows/deploy.yml)
 
 ### Compose files
 
-| File                                                               | Purpose                                              |
-| ------------------------------------------------------------------ | ---------------------------------------------------- |
-| [local-docker-compose.yml](../local-docker-compose.yml)           | Local dev — Postgres only                            |
-| [prod-docker-compose.yml](../prod-docker-compose.yml)             | Full production stack                                |
-| [cert-docker-compose.yml](../cert-docker-compose.yml)             | One-time initial TLS cert issuance (HTTP-only nginx) |
+| File                                                    | Purpose                                              |
+| ------------------------------------------------------- | ---------------------------------------------------- |
+| [local-docker-compose.yml](../local-docker-compose.yml) | Local dev — Postgres only                            |
+| [prod-docker-compose.yml](../prod-docker-compose.yml)   | Full production stack                                |
+| [cert-docker-compose.yml](../cert-docker-compose.yml)   | One-time initial TLS cert issuance (HTTP-only nginx) |
 
 ### First deploy — step by step
 

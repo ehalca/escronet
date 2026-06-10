@@ -5,7 +5,6 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@trpc/server": "^11.4.3",
     "zod": "^3.24.1"
   },
   "scripts": {

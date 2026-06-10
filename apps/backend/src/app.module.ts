@@ -1,12 +1,18 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
+import { TerminusModule } from "@nestjs/terminus";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Caller } from "./entities/caller.entity";
-import { Guardian } from "./entities/guardian.entity";
+import { GuardianLink } from "./entities/guardian-link.entity";
+import { GuardianRelation } from "./entities/guardian-relation.entity";
 import { User } from "./entities/user.entity";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CallersModule } from "./modules/callers/callers.module";
+import { GuardianEventsModule } from "./gateway/guardian-events.module";
+import { GuardianLinksModule } from "./modules/guardian-links/guardian-links.module";
+import { GuardiansModule } from "./modules/guardians/guardians.module";
+import { HealthController } from "./controllers/health.controller";
 
 @Module({
   imports: [
@@ -22,11 +28,16 @@ import { CallersModule } from "./modules/callers/callers.module";
         password: config.get<string>("DB_PASSWORD", "escronet"),
         database: config.get<string>("DB_NAME", "escronet"),
         synchronize: true,
-        entities: [Caller, Guardian, User],
+        entities: [Caller, GuardianLink, GuardianRelation, User],
       }),
     }),
+    TerminusModule,
     AuthModule,
     CallersModule,
+    GuardianEventsModule,
+    GuardianLinksModule,
+    GuardiansModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

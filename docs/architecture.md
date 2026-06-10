@@ -6,7 +6,7 @@
 
 | #   | Component         | Purpose                                                                     |
 | --- | ----------------- | --------------------------------------------------------------------------- |
-| 1.1 | NestJS API server | REST + tRPC endpoints — auth, alerts, contacts, scam-number management      |
+| 1.1 | NestJS API server | REST endpoints — auth, alerts, contacts, scam-number management             |
 | 1.2 | PostgreSQL        | Persistent storage for users, alerts, scam reports, designated contacts     |
 | 1.3 | Next.js web app   | Landing page, help, FAQ, terms, stats, MODERATOR dashboard, ADMIN dashboard |
 
@@ -34,7 +34,13 @@ For Android-specific implementation details see [android.md](android.md).
 
 ## Shared types
 
-`packages/shared` contains the tRPC router contract used by both the NestJS API and the mobile app. Rebuild after any router change:
+`packages/shared` contains Zod schemas, inferred TypeScript interfaces, and a typed `fetch`-based API client used by both the NestJS backend and the mobile/frontend clients. There is no tRPC — all server–client communication uses plain REST with shared DTOs for type safety.
+
+- **Schemas** (`packages/shared/src/schemas/`) — Zod schemas that are the single source of truth for request/response shapes. The backend validates incoming requests against these schemas; clients parse responses through them.
+- **Interfaces** (`packages/shared/src/interfaces/`) — TypeScript types inferred from the schemas via `z.infer<>`.
+- **API client** (`packages/shared/src/api/client.ts`) — `createApiClient(baseUrl, getToken?)` returns a typed client used by mobile and frontend. Responses are parsed and validated with the shared schemas.
+
+Rebuild the shared package after changing any schema or client:
 
 ```bash
 pnpm --filter @escronet/shared build

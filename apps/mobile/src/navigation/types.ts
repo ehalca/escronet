@@ -14,7 +14,7 @@ export type TabParamList = {
 
 export type SettingsStackParamList = {
   SettingsMain: undefined;
-  Guardian: undefined;
+  Guardian: { code?: string } | undefined;
 };
 
 export type HomeScreenNavProp = CompositeNavigationProp<

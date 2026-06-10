@@ -14,7 +14,7 @@ export type CallerDeltaRecord = z.infer<typeof CallerDeltaRecordSchema>;
 
 export const CallerDeltaQuerySchema = z.object({
   lastSyncDate: z.string().datetime(),
-  limit: z.number().int().min(1).max(5000).default(1000),
+  limit: z.coerce.number().int().min(1).max(5000).default(1000),
 });
 
 export type CallerDeltaQuery = z.infer<typeof CallerDeltaQuerySchema>;

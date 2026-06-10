@@ -4,42 +4,60 @@
 
 ```
 apps/backend/src/
-├── main.ts                       ← bootstrap, port 3000
+├── main.ts                       ← bootstrap, port 3000, global prefix /api
 ├── app.module.ts                 ← root module, TypeORM connection
 ├── common/
+│   └── zod-validation.pipe.ts   ← per-param ZodValidationPipe
+├── controllers/
+│   └── health.controller.ts     ← GET /api/ping, GET /api/health
 ├── entities/
-│
 ├── modules/
-└── trpc/
-    ├── trpc.ts                   ← tRPC init
-    └── mount-trpc.ts             ← mounts tRPC under /trpc
+│   ├── auth/
+│   │   ├── auth.controller.ts   ← POST /api/auth/register
+│   │   ├── auth.service.ts
+│   │   └── auth.module.ts
+│   └── callers/
+│       ├── callers.controller.ts ← GET /api/callers/delta
+│       ├── callers.service.ts
+│       └── callers.module.ts
 ```
 
-tRPC routes are mounted at `/trpc` and currently expose `health.ping` and the auth procedures.
+## API
+
+All routes are prefixed with `/api`. Request validation uses `ZodValidationPipe` applied per-parameter, backed by the Zod schemas in `packages/shared`.
+
+| Method | Path                  | Description                                    |
+| ------ | --------------------- | ---------------------------------------------- |
+| GET    | `/api/ping`           | Health check — returns `{ message, timestamp }`|
+| GET    | `/api/health`         | Readiness check — returns `{ ok: true }`       |
+| POST   | `/api/auth/register`  | Register device, returns `{ token, userId }`   |
+| GET    | `/api/callers/delta`  | Caller delta sync since `lastSyncDate`         |
+
+## Server–client contract
+
+There is no tRPC. The backend exposes plain REST endpoints. Type safety is maintained through `packages/shared`:
+
+- **Zod schemas** in `packages/shared/src/schemas/` define request and response shapes.
+- **Controllers** validate incoming requests using `ZodValidationPipe(schema)` applied to `@Body()` or `@Query()` parameters.
+- **Clients** (mobile, frontend) call the backend through `createApiClient` from `packages/shared/src/api/client.ts`, which parses responses with the same schemas.
+
+Adding a new endpoint:
+1. Define or reuse a schema in `packages/shared/src/schemas/`.
+2. Create or update the controller in `apps/backend/src/modules/<name>/`.
+3. Register the controller in its module.
+4. Expose the route in `createApiClient` in `packages/shared/src/api/client.ts`.
 
 ## Auth flow (scaffolded — not production-ready)
 
-1. Client calls `POST /auth/request-otp` with E.164 phone number
-2. Server generates OTP, stores with TTL, sends SMS (Twilio — provider TBD)
-3. Client calls `POST /auth/verify-otp` with code
-4. Server returns signed JWT (`sub`: SHA-256 of phone number)
-5. Client stores JWT in MMKV; attaches as `Authorization: Bearer <token>` on subsequent requests
-
-Open decisions: SMS provider, JWT algorithm (HS256 vs RS256), OTP storage (in-memory Map vs Redis). See [PLAN.md](../PLAN.md#open-decisions).
+1. Client calls `POST /api/auth/register` with `{ deviceId, fcmToken? }`
+2. Server upserts the user record and returns `{ token, userId }` (token is the user ID for now; Firebase JWT verification replaces this later)
+3. Client stores the token in MMKV and attaches it as `Authorization: Bearer <token>` on subsequent requests
 
 ## Database
 
-PostgreSQL via TypeORM. Connection configured in `app.module.ts` from environment variables. Migration SQL is in `migrations/001_init.sql` — run manually for now. A migration CLI script is planned (Phase 8).
+PostgreSQL via TypeORM. Connection configured in `app.module.ts` from environment variables. `synchronize: true` is enabled for development — replace with explicit migrations before production.
 
-For local development: `docker-compose up -d` starts PostgreSQL on port 5432.
-
-## Shared types
-
-The tRPC router type is exported from `packages/shared`. The mobile app imports it for type-safe API calls. After changing the router:
-
-```bash
-pnpm --filter @escronet/shared build
-```
+For local development: `docker compose -f local-docker-compose.yml up -d` starts PostgreSQL on port 5432.
 
 ## Environment
 

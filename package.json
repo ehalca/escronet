@@ -17,6 +17,7 @@
     "dev:mobile": "pnpm --filter @escronet/mobile start",
     "android": "pnpm --filter @escronet/mobile android",
     "emulator": "pnpm --filter @escronet/mobile emulator",
+    "emulator2": "pnpm --filter @escronet/mobile emulator2",
     "dev:android": "pnpm --filter @escronet/mobile dev:android",
     "dev": "docker compose -f local-docker-compose.yml up -d && concurrently -n shared,backend,frontend -c cyan,blue,green \"pnpm dev:shared\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "dev:shared": "pnpm --filter @escronet/shared dev:types",

@@ -120,6 +120,9 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
+    // Bundle MLKit barcode scanner so it doesn't need a Play Services dynamic download
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

@@ -30,9 +30,35 @@ export type {
   CallerDeltaQuery,
 } from "./schemas/caller.schema";
 
+export {
+  GenerateGuardianLinkResponseSchema,
+  ClaimGuardianLinkInputSchema,
+  ClaimGuardianLinkResponseSchema,
+  GuardianLinkSchema,
+  ListGuardianLinksResponseSchema,
+} from "./schemas/guardian-link.schema";
 export type {
-  AppRouter,
-  AuthRouterHandlers,
-  CallerRouterHandlers,
-} from "./trpc/app-router";
-export { createAppRouter } from "./trpc/app-router";
+  GenerateGuardianLinkResponse,
+  ClaimGuardianLinkInput,
+  ClaimGuardianLinkResponse,
+  GuardianLinkRecord,
+  ListGuardianLinksResponse,
+} from "./schemas/guardian-link.schema";
+
+export {
+  GuardianRecordSchema,
+  ListGuardiansResponseSchema,
+  GuardedUserSchema,
+  ListGuardedUsersResponseSchema,
+  UpdateLabelInputSchema,
+} from "./schemas/guardian.schema";
+export type {
+  GuardianRecord,
+  ListGuardiansResponse,
+  GuardedUser,
+  ListGuardedUsersResponse,
+  UpdateLabelInput,
+} from "./schemas/guardian.schema";
+
+export { createApiClient } from "./api/client";
+export type { ApiClient } from "./api/client";
