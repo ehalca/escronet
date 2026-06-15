@@ -167,8 +167,8 @@ const poll = setInterval(() => {
   console.log(`\n${trackedSerial} fully booted.`);
 
   adb("-s", trackedSerial, "reverse", "tcp:8081", "tcp:8081");
-  adb("-s", trackedSerial, "reverse", "tcp:3000", "tcp:3000");
-  console.log("Reverse tunnels: :8081 (Metro) :3000 (backend)");
+  adb("-s", trackedSerial, "reverse", "tcp:3010", "tcp:3010");
+  console.log("Reverse tunnels: :8081 (Metro) :3010 (backend)");
 
   console.log("Installing APK...");
   const install = spawnSync(ADB, ["-s", trackedSerial, "install", "-r", "-t", APK], {

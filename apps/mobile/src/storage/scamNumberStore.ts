@@ -1,5 +1,6 @@
 import { open } from "@op-engineering/op-sqlite";
-import { createHash } from "react-native-quick-crypto";
+import { sha256 } from "@noble/hashes/sha2";
+import { bytesToHex } from "@noble/hashes/utils";
 
 const db = open({ name: "escronet.db" });
 
@@ -33,7 +34,7 @@ export function normalizeE164(rawPhone: string): string {
 
 export function hashPhoneNumber(rawPhone: string): string {
   const normalized = normalizeE164(rawPhone);
-  return createHash("sha256").update(normalized).digest("hex");
+  return bytesToHex(sha256(normalized));
 }
 
 export async function upsertScamHash(record: ScamHashRecord): Promise<void> {

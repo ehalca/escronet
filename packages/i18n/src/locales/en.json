@@ -15,7 +15,26 @@
   "alerts": {
     "title": "Alerts",
     "emptyTitle": "No alerts yet",
-    "emptySubtitle": "Detected scam calls will appear here"
+    "emptySubtitle": "Detected scam calls will appear here",
+    "myAlerts": "My Alerts",
+    "noMyAlerts": "No scam calls detected on your device",
+    "guardingSection": "People I'm Guarding",
+    "noGuarding": "Not guarding anyone",
+    "noGuardingSub": "Pair with someone as their guardian to see their alerts here",
+    "unknownUser": "Unknown",
+    "durationSecs_one": "{{count}} sec",
+    "durationSecs_other": "{{count}} secs",
+    "durationMinsAndSecs": "{{m}} min {{s}} secs",
+    "durationHoursAndMins": "{{h}} hour {{m}} mins",
+    "tapToMarkSeen": "Tap to dismiss",
+    "seen": "Seen",
+    "riskLowest": "Minimal",
+    "riskLow": "Low Risk",
+    "riskMedium": "Medium Risk",
+    "riskHigh": "High Risk",
+    "riskHighest": "Critical",
+    "category": "Category",
+    "callerLabel": "Caller"
   },
   "settings": {
     "title": "Settings",
@@ -68,5 +87,9 @@
     "labelRequired": "Please enter a name.",
     "successClaimed": "You are now a guardian!",
     "successPaired": "Guardian linked successfully!"
+  },
+  "smsBanner": {
+    "title": "SCAM ALERT",
+    "body": "You received an OTP code while on a call with an unknown number. Do NOT share it."
   }
 }

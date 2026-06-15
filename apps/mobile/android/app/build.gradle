@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: "com.google.gms.google-services"
 
 // Pin onnxruntime-android to a specific version to avoid dynamic 'latest.integration'
 // resolution which triggers a SAX XML parsing bug in Gradle on some JDK builds.

@@ -1,9 +1,9 @@
 export { RiskLevel } from "./enums/risk-level.enum";
 export {
   RegisterDeviceInputSchema,
-  AuthTokenSchema,
+  AuthResponseSchema,
 } from "./schemas/auth.schema";
-export type { RegisterDeviceInput, AuthToken } from "./schemas/auth.schema";
+export type { RegisterDeviceInput, AuthResponse } from "./schemas/auth.schema";
 
 export type ScamNumberDeltaRecord = {
   phoneHash: string;
@@ -59,6 +59,37 @@ export type {
   ListGuardedUsersResponse,
   UpdateLabelInput,
 } from "./schemas/guardian.schema";
+
+export {
+  CreateAlertInputSchema,
+  AlertRecordSchema,
+  AlertInNotificationSchema,
+  AlertNotificationRecordSchema,
+  CreateAlertResponseSchema,
+  ListMyAlertsResponseSchema,
+  ListAlertNotificationsResponseSchema,
+  AlertStatusSchema,
+  UpdateAlertStatusInputSchema,
+  UpdateAlertRiskInputSchema,
+} from "./schemas/alert.schema";
+export type {
+  CreateAlertInput,
+  AlertRecord,
+  AlertInNotification,
+  AlertNotificationRecord,
+  CreateAlertResponse,
+  ListMyAlertsResponse,
+  ListAlertNotificationsResponse,
+  AlertStatus,
+  UpdateAlertStatusInput,
+  UpdateAlertRiskInput,
+} from "./schemas/alert.schema";
+export type {
+  IAlert,
+  IAlertNotification,
+  ICreateAlertResponse,
+  IListAlertNotificationsResponse,
+} from "./interfaces/alert.interface";
 
 export { createApiClient } from "./api/client";
 export type { ApiClient } from "./api/client";

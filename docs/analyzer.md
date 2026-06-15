@@ -18,19 +18,28 @@ The Analyzer is started by the Background service with:
 
 ## Processing loop
 
-The Analyzer runs a continuous chunk-evaluation loop for the duration of the active call.
+The Analyzer runs two concurrent listeners for the duration of the active call: the **audio chunk loop** and the **SMS/message monitor**. Either can independently trigger a HIGH escalation.
 
 ```
 ANSWERED
   └─ wait CALL_TRIGGER_LIMIT_SECONDS
-       └─ loop:
-            1. Capture PARAMETRIZED_CHUNK_LENGTH of audio
-            2. Detect language
-            3. Transcribe audio → text
-            4. Classify transcript → { category, score, riskLevel }
-            5. Emit result to Guardian service
-            6. If riskLevel == HIGH or call ENDED → stop
-               Else → continue loop
+       ├─ [Audio loop]
+       │    loop:
+       │      1. Capture PARAMETRIZED_CHUNK_LENGTH of audio
+       │      2. Detect language
+       │      3. Transcribe audio → text
+       │      4. Classify transcript → { category, score, riskLevel }
+       │      5. Emit result to Guardian service
+       │      6. If riskLevel == HIGH or call ENDED → stop
+       │         Else → continue loop
+       │
+       └─ [SMS/message monitor — runs in parallel]
+              On each incoming message while call is active:
+                1. Extract message body
+                2. Run OTP/code detection (see below)
+                3. If code detected → emit riskLevel=HIGH, category=SMS_CODE_REQUEST
+                                    → stop both loops
+                   Else → continue monitoring
 ```
 
 **Parameters:**
@@ -40,7 +49,48 @@ ANSWERED
 | `CALL_TRIGGER_LIMIT_SECONDS` | Seconds after answer before first chunk is captured. Configurable. Default TBD. |
 | `PARAMETRIZED_CHUNK_LENGTH` | Duration in seconds of each audio chunk fed to the classifier. Configurable. Default TBD. |
 
-The risk level produced by the Analyzer can only increase. Once HIGH is emitted, the loop stops — the Background service and Guardian service take over.
+The risk level produced by the Analyzer can only increase. Once HIGH is emitted by either loop, both loops stop — the Background service and Guardian service take over.
+
+---
+
+## SMS/message monitor
+
+While the audio loop is running, the Analyzer simultaneously monitors all incoming SMS and messaging notifications for code-extraction patterns. This covers the common scam vector where the caller keeps the victim on the phone while an SMS code arrives and then socially engineers them into reading it out.
+
+### Detection signals
+
+A message is flagged if it matches one or more of the following:
+
+| Signal | Description |
+|---|---|
+| **Numeric OTP pattern** | Message body contains a standalone digit sequence of 4–8 digits (e.g. `123456`, `4729`, `83920174`) not embedded in a longer number |
+| **OTP keyword** | Message contains keywords: `OTP`, `one-time`, `one time`, `verification code`, `cod de verificare`, `код подтверждения`, `authentication code`, `security code`, `access code`, `login code`, `sign-in code` |
+| **Sender pattern** | Message sender is a short-code or alphanumeric sender ID (e.g. `BANK`, `AUTH`, `VERIFY`, 5-6 digit short codes) — raises suspicion weight, not a standalone trigger |
+| **Code-request phrasing** | Message body contains phrases like `your code is`, `codul tău este`, `ваш код`, `do not share`, `nu distribuiți`, `не передавайте` |
+
+A match on any **numeric OTP pattern** or **OTP keyword** signal alone is sufficient to trigger HIGH. Sender pattern alone is not.
+
+### Output on detection
+
+When a code is detected the monitor emits to the Guardian service immediately, bypassing the audio chunk loop:
+
+| Field | Value |
+|---|---|
+| `riskLevel` | `HIGH` |
+| `category` | `SMS_CODE_REQUEST` |
+| `score` | `1.0` |
+| `language` | `null` (message language not classified) |
+| `transcriptSnippet` | `null` |
+| `chunkIndex` | `-1` (sentinel — indicates SMS trigger, not audio chunk) |
+
+### Open questions (SMS monitor)
+
+| Question | Notes |
+|---|---|
+| Detection techniques beyond OTP (TBD) | Additional patterns to be defined as new scam vectors are observed |
+| Minimum digit run length | 4 chosen as floor; needs tuning against false positives (e.g. dates, prices) |
+| Multi-message threshold | Single matching message sufficient, or require N within a time window? |
+| Access model | Requires notification listener permission on Android; define fallback if denied |
 
 ---
 
@@ -86,7 +136,7 @@ After each chunk evaluation the Analyzer emits to the **Guardian service**:
 | `score` | Classifier confidence score (0.0 – 1.0) |
 | `language` | Detected language code, or `LANG_UNSUPPORTED` |
 | `transcriptSnippet` | Short excerpt of the transcribed text (used by Guardian service for backend upload) |
-| `chunkIndex` | Sequence number of this chunk within the call |
+| `chunkIndex` | Sequence number of this chunk within the call. `-1` indicates an SMS monitor trigger (not an audio chunk) |
 
 The Guardian service acts on `riskLevel` changes. See [mobile.md](mobile.md) and the Guardian service contract for how each level is handled.
 
@@ -94,9 +144,10 @@ The Guardian service acts on `riskLevel` changes. See [mobile.md](mobile.md) and
 
 ## Stop conditions
 
-The Analyzer stops the loop on any of the following:
+The Analyzer stops **both** the audio loop and the SMS monitor on any of the following:
 
-- `riskLevel == HIGH` emitted — Guardian service takes over full escalation.
+- `riskLevel == HIGH` emitted by the audio loop — Guardian service takes over full escalation.
+- `riskLevel == HIGH` emitted by the SMS monitor — same escalation path, category forced to `SMS_CODE_REQUEST`.
 - `ENDED` event received from the Background service.
 - USER explicitly dismisses the analysis (via Guardian service notification action).
 

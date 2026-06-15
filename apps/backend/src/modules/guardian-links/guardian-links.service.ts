@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -29,6 +30,8 @@ function generateCode(): string {
 
 @Injectable()
 export class GuardianLinksService {
+  private readonly logger = new Logger(GuardianLinksService.name);
+
   constructor(
     @InjectRepository(GuardianLink)
     private readonly linkRepo: Repository<GuardianLink>,
@@ -51,6 +54,7 @@ export class GuardianLinksService {
     const link = this.linkRepo.create({ code, expiresAt, usedAt: null, userId, relationId: null });
     await this.linkRepo.save(link);
 
+    this.logger.log(`[generate] user=${userId} code=${link.code} id=${link.id} expiresAt=${link.expiresAt.toISOString()}`);
     return {
       id: link.id,
       code: link.code,
@@ -63,6 +67,7 @@ export class GuardianLinksService {
     guardianUserId: string,
     input: { code: string; userLabel: string; guardianLabel?: string },
   ): Promise<ClaimGuardianLinkResponse> {
+    this.logger.log(`[claim] guardian=${guardianUserId} code=${input.code}`);
     const link = await this.linkRepo.findOne({ where: { code: input.code.toUpperCase() } });
 
     if (!link) throw new NotFoundException("Guardian link not found");
@@ -84,6 +89,9 @@ export class GuardianLinksService {
     link.relationId = relation.id;
     await this.linkRepo.save(link);
 
+    this.logger.log(
+      `[claim] link=${link.id} claimed by guardian=${guardianUserId} relation=${relation.id} protectedUser=${link.userId}`,
+    );
     this.events.notifyPaired(link.userId, guardianUserId, relation.id);
 
     return { relationId: relation.id, guardedUserId: link.userId };
@@ -94,6 +102,7 @@ export class GuardianLinksService {
       where: { userId },
       order: { createdAt: "DESC" },
     });
+    this.logger.log(`[listByUser] user=${userId} count=${links.length}`);
     return {
       links: links.map((l) => ({
         id: l.id,
@@ -105,10 +114,12 @@ export class GuardianLinksService {
   }
 
   async delete(userId: string, linkId: string): Promise<void> {
+    this.logger.log(`[delete] user=${userId} linkId=${linkId}`);
     const link = await this.linkRepo.findOne({ where: { id: linkId } });
     if (!link) throw new NotFoundException("Guardian link not found");
     if (link.userId !== userId) throw new ForbiddenException("Not your guardian link");
     if (link.usedAt) throw new BadRequestException("Cannot delete a claimed link");
     await this.linkRepo.remove(link);
+    this.logger.log(`[delete] link=${linkId} deleted code=${link.code}`);
   }
 }

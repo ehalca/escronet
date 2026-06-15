@@ -8,16 +8,14 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  UseGuards,
 } from "@nestjs/common";
 import { UpdateLabelInputSchema } from "@escronet/shared";
 import type { UpdateLabelInput } from "@escronet/shared";
-import { BearerAuthGuard, CurrentUser } from "../../common/current-user.decorator";
+import { CurrentUser } from "../../common/current-user.decorator";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { GuardiansService } from "./guardians.service";
 
 @Controller("guardians")
-@UseGuards(BearerAuthGuard)
 export class GuardiansController {
   constructor(private readonly guardiansService: GuardiansService) {}
 

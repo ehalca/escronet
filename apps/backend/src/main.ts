@@ -9,7 +9,7 @@ async function bootstrap(): Promise<void> {
   app.enableCors();
   app.setGlobalPrefix("api");
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
-  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
+  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3010);
 }
 
 void bootstrap();

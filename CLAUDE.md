@@ -65,7 +65,11 @@ All tRPC handlers must implement entry point functions with only 1 paramater (in
 - [Call Processor](docs/call-processor.md) — background service risk-level handling and backend events
 - [Analyzer](docs/analyzer.md) — audio chunk pipeline, language support, scam categories, Guardian service emission
 - [Guardian Service](docs/guardian.md) — event processor for blocking calls, local alerts, and GUARDIAN notifications
-- [Backend](docs/backend.md) — NestJS modules, tRPC, database, FCM
+- [Alerts](docs/alerts.md) — alert lifecycle, entity schema, duration tracking, guardian push retry, risk escalation, WebSocket real-time updates, AlertsScreen behaviour
+- [Backend](docs/backend.md) — NestJS modules, REST API surface, WebSocket gateway, database, FCM
+- [Push Notifications](docs/push-notifications.md) — FCM v22 modular API, Android channel requirements, notification tap navigation, foreground refresh, iOS APNs migration path
+- [Authentication](docs/auth.md) — EC P-256 device identity, Firebase Custom Auth flow, `waitForInitialAuthState` pattern, iOS migration notes, setup checklist
+- [SMS OTP Banner](docs/sms-otp-banner.md) — OTP detection heuristic, Android overlay implementation, permissions, iOS limitations and alternatives
 
 #UI
 

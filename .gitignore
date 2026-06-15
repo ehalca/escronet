@@ -156,3 +156,5 @@ apps/backend/dist/
 
 # Production secrets — provision manually on the server, never commit
 prod.env
+apps/backend/escronet-dev.json
+apps/mobile/android/app/google-services.json

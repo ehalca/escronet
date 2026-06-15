@@ -8,16 +8,14 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  UseGuards,
 } from "@nestjs/common";
 import { ClaimGuardianLinkInputSchema } from "@escronet/shared";
 import type { ClaimGuardianLinkInput } from "@escronet/shared";
-import { BearerAuthGuard, CurrentUser } from "../../common/current-user.decorator";
+import { CurrentUser } from "../../common/current-user.decorator";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { GuardianLinksService } from "./guardian-links.service";
 
 @Controller("guardian-links")
-@UseGuards(BearerAuthGuard)
 export class GuardianLinksController {
   constructor(private readonly guardianLinksService: GuardianLinksService) {}
 

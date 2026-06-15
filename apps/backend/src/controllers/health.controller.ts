@@ -4,7 +4,9 @@ import {
   HealthCheckService,
   TypeOrmHealthIndicator,
 } from "@nestjs/terminus";
+import { SkipAuth } from "../common/current-user.decorator";
 
+@SkipAuth()
 @Controller({
   version: VERSION_NEUTRAL,
 })

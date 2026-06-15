@@ -15,7 +15,26 @@
   "alerts": {
     "title": "Уведомления",
     "emptyTitle": "Пока нет уведомлений",
-    "emptySubtitle": "Обнаруженные мошеннические звонки появятся здесь"
+    "emptySubtitle": "Обнаруженные мошеннические звонки появятся здесь",
+    "myAlerts": "Мои уведомления",
+    "noMyAlerts": "На вашем устройстве не обнаружено мошеннических звонков",
+    "guardingSection": "Люди под моей защитой",
+    "noGuarding": "Вы ни за кем не следите",
+    "noGuardingSub": "Станьте хранителем, чтобы видеть здесь оповещения",
+    "unknownUser": "Неизвестный",
+    "durationSecs_one": "{{count}} сек",
+    "durationSecs_other": "{{count}} сек",
+    "durationMinsAndSecs": "{{m}} мин {{s}} сек",
+    "durationHoursAndMins": "{{h}} ч {{m}} мин",
+    "tapToMarkSeen": "Нажмите, чтобы скрыть",
+    "seen": "Просмотрено",
+    "riskLowest": "Минимальный",
+    "riskLow": "Низкий риск",
+    "riskMedium": "Средний риск",
+    "riskHigh": "Высокий риск",
+    "riskHighest": "Критический",
+    "category": "Категория",
+    "callerLabel": "Звонящий"
   },
   "settings": {
     "title": "Настройки",
@@ -68,5 +87,9 @@
     "labelRequired": "Пожалуйста, введите имя.",
     "successClaimed": "Теперь вы хранитель!",
     "successPaired": "Хранитель успешно привязан!"
+  },
+  "smsBanner": {
+    "title": "МОШЕННИЧЕСТВО",
+    "body": "Вы получили OTP-код во время звонка с неизвестного номера. НЕ сообщайте его никому."
   }
 }

@@ -25,7 +25,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { api } from "../api/api";
-import { getToken } from "../storage/authStore";
+import { getAuth } from "@react-native-firebase/auth";
 import type { ClaimGuardianLinkInput } from "@escronet/shared";
 import type { SettingsStackParamList } from "../navigation/types";
 
@@ -34,7 +34,7 @@ const QRCode = QRCodeSvg as unknown as React.ComponentType<{
   value: string; size?: number; backgroundColor?: string; color?: string;
 }>;
 
-const WS_URL = __DEV__ ? "http://10.0.2.2:3000" : "https://api.escronet.com";
+const WS_URL = __DEV__ ? "http://10.0.2.2:3010" : "https://api.escronet.com";
 
 const KEYS = {
   guardians:   ["guardians"]    as const,
@@ -127,25 +127,31 @@ export function GuardianScreen({ route }: Props): React.JSX.Element {
   qrModalVisibleRef.current = qrModal.visible;
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) return;
+    void (async () => {
+      const token = await (getAuth().currentUser?.getIdToken() ?? null);
+      if (!token) return;
 
-    const socket = io(`${WS_URL}/guardian`, { auth: { token }, transports: ["websocket"] });
+      const socket = io(`${WS_URL}/guardian`, { auth: { token }, transports: ["websocket"] });
 
-    socket.on("guardian-paired", () => {
-      if (qrModalVisibleRef.current) {
-        setQrModal({ visible: false });
-        Alert.alert("", t("guardian.successPaired"));
-      }
-      invalidateAll();
-    });
+      socket.on("guardian-paired", () => {
+        if (qrModalVisibleRef.current) {
+          setQrModal({ visible: false });
+          Alert.alert("", t("guardian.successPaired"));
+        }
+        invalidateAll();
+      });
 
-    socket.on("guardian-removed", () => {
-      invalidateAll();
-    });
+      socket.on("guardian-removed", () => {
+        invalidateAll();
+      });
 
-    socketRef.current = socket;
-    return () => { socket.disconnect(); socketRef.current = null; };
+      socketRef.current = socket;
+    })();
+
+    return () => {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

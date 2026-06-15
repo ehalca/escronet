@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { GuardianRelation } from "../../entities/guardian-relation.entity";
@@ -7,6 +7,8 @@ import type { GuardianRecord, GuardedUser } from "@escronet/shared";
 
 @Injectable()
 export class GuardiansService {
+  private readonly logger = new Logger(GuardiansService.name);
+
   constructor(
     @InjectRepository(GuardianRelation)
     private readonly relationRepo: Repository<GuardianRelation>,
@@ -18,6 +20,7 @@ export class GuardiansService {
       where: { userId },
       order: { createdAt: "ASC" },
     });
+    this.logger.log(`[listGuardians] user=${userId} count=${rows.length}`);
     return {
       guardians: rows.map((r) => ({
         id: r.id,
@@ -34,6 +37,7 @@ export class GuardiansService {
       where: { guardianUserId },
       order: { createdAt: "ASC" },
     });
+    this.logger.log(`[listGuardedUsers] guardian=${guardianUserId} count=${rows.length}`);
     return {
       guardedUsers: rows.map((r) => ({
         id: r.id,
@@ -45,11 +49,6 @@ export class GuardiansService {
     };
   }
 
-  /**
-   * Each side updates THEIR label:
-   * - Protected user (userId) → sets userLabel (how they name the guardian)
-   * - Guardian (guardianUserId) → sets guardianLabel (how they name the user)
-   */
   async updateLabel(requesterId: string, relationId: string, label: string): Promise<void> {
     const relation = await this.relationRepo.findOne({ where: { id: relationId } });
     if (!relation) throw new NotFoundException("Guardian relation not found");
@@ -63,6 +62,7 @@ export class GuardiansService {
     }
 
     await this.relationRepo.save(relation);
+    this.logger.log(`[updateLabel] relation=${relationId} updated by requester=${requesterId}`);
   }
 
   async remove(requesterId: string, relationId: string): Promise<void> {
@@ -75,6 +75,9 @@ export class GuardiansService {
 
     const { userId, guardianUserId } = relation;
     await this.relationRepo.remove(relation);
+    this.logger.log(
+      `[remove] relation=${relationId} removed by requester=${requesterId} userId=${userId} guardianUserId=${guardianUserId}`,
+    );
     this.events.notifyRemoved(userId, guardianUserId, relationId);
   }
 }

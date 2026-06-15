@@ -15,7 +15,26 @@
   "alerts": {
     "title": "Alerte",
     "emptyTitle": "Nicio alertă deocamdată",
-    "emptySubtitle": "Apelurile frauduloase detectate vor apărea aici"
+    "emptySubtitle": "Apelurile frauduloase detectate vor apărea aici",
+    "myAlerts": "Alertele Mele",
+    "noMyAlerts": "Niciun apel fraudulos detectat pe dispozitivul tău",
+    "guardingSection": "Persoane supravegheate",
+    "noGuarding": "Nu supraveghezi pe nimeni",
+    "noGuardingSub": "Asociază-te cu cineva ca guardian pentru a vedea alertele lor",
+    "unknownUser": "Necunoscut",
+    "durationSecs_one": "{{count}} sec",
+    "durationSecs_other": "{{count}} sec",
+    "durationMinsAndSecs": "{{m}} min {{s}} sec",
+    "durationHoursAndMins": "{{h}} oră {{m}} min",
+    "tapToMarkSeen": "Apasă pentru a respinge",
+    "seen": "Văzut",
+    "riskLowest": "Minimal",
+    "riskLow": "Risc Scăzut",
+    "riskMedium": "Risc Mediu",
+    "riskHigh": "Risc Ridicat",
+    "riskHighest": "Critic",
+    "category": "Categorie",
+    "callerLabel": "Apelant"
   },
   "settings": {
     "title": "Setări",
@@ -68,5 +87,9 @@
     "labelRequired": "Te rugăm să introduci un nume.",
     "successClaimed": "Ești acum guardian!",
     "successPaired": "Guardian conectat cu succes!"
+  },
+  "smsBanner": {
+    "title": "ALERTĂ FRAUDĂ",
+    "body": "Ai primit un cod OTP în timp ce vorbeai cu un număr necunoscut. NU îl comunica nimănui."
   }
 }

@@ -2,12 +2,14 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { RegisterDeviceInputSchema } from "@escronet/shared";
 import type { RegisterDeviceInput } from "@escronet/shared";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { SkipAuth } from "../../common/current-user.decorator";
 import { AuthService } from "./auth.service";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @SkipAuth()
   @Post("register")
   register(
     @Body(new ZodValidationPipe(RegisterDeviceInputSchema)) body: RegisterDeviceInput,
