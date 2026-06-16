@@ -51,6 +51,7 @@
     "myGuardians": "Guardianele Mele",
     "iAmGuardian": "Sunt Guardian",
     "scanQr": "Scanează Codul QR",
+    "enterCode": "Introduceți codul",
     "qrModalTitle": "Distribuie acest QR",
     "qrModalBody": "Roagă guardianul tău să scaneze acest cod cu aplicația Escronet.",
     "qrExpires": "Expiră în 24 de ore",

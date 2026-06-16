@@ -51,6 +51,7 @@
     "myGuardians": "My Guardians",
     "iAmGuardian": "I Am a Guardian",
     "scanQr": "Scan QR Code",
+    "enterCode": "Enter Code",
     "qrModalTitle": "Share this QR",
     "qrModalBody": "Ask your guardian to scan this code with their Escronet app.",
     "qrExpires": "Expires in 24 hours",

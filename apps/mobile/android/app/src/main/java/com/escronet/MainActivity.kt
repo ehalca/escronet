@@ -21,10 +21,12 @@ class MainActivity : ReactActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestCallDetectionPermissions()
-        ContextCompat.startForegroundService(
-            this,
-            Intent(this, CallDetectionForegroundService::class.java)
-        )
+        if (AnalyzerControlModule.isEnabled(this)) {
+            ContextCompat.startForegroundService(
+                this,
+                Intent(this, CallDetectionForegroundService::class.java)
+            )
+        }
     }
 
     private fun requestCallDetectionPermissions() {

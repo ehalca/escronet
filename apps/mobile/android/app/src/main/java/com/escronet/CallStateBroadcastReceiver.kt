@@ -12,6 +12,7 @@ class CallStateBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != TelephonyManager.ACTION_PHONE_STATE_CHANGED) return
+        if (!AnalyzerControlModule.isEnabled(context)) return
         ContextCompat.startForegroundService(
             context,
             Intent(context, CallDetectionForegroundService::class.java)

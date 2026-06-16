@@ -7,13 +7,14 @@ services:
     environment:
       POSTGRES_USER: escronet
       POSTGRES_DB: escronet
+      # POSTGRES_PASSWORD is read from prod.env
     volumes:
       - ~/escronet/postgres:/var/lib/postgresql/data
     env_file:
       - ~/escronet/prod.env
 
   backend:
-    image: escronet/backend:latest
+    image: ehalca/escronet:backend
     restart: unless-stopped
     depends_on:
       - postgres
@@ -24,13 +25,15 @@ services:
       DB_USER: escronet
       DB_NAME: escronet
       NODE_ENV: production
+    volumes:
+      - ~/escronet/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
       - ~/escronet/prod.env
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
   frontend:
-    image: escronet/frontend:latest
+    image: ehalca/escronet:frontend
     restart: unless-stopped
     environment:
       PORT: 3011

@@ -25,12 +25,17 @@ export interface IOSCallKitModule {
   syncBlockedHashes(hashes: string[]): Promise<void>;
 }
 
+export interface AnalyzerControlModule {
+  setEnabled(enabled: boolean): Promise<void>;
+}
+
 const modules = NativeModules as {
   CallMonitorModule?: AndroidCallMonitorModule;
   WhisperModule?: WhisperModule;
   ClassifierModule?: ClassifierModule;
   CallKitModule?: IOSCallKitModule;
   IOSCallMonitorModule?: Record<string, unknown>;
+  AnalyzerControl?: AnalyzerControlModule;
 };
 
 export function requireAndroidCallMonitor(): AndroidCallMonitorModule {
@@ -61,4 +66,8 @@ export function requireClassifierModule(): ClassifierModule {
 
 export function getIOSCallKitModule(): IOSCallKitModule | undefined {
   return modules.CallKitModule;
+}
+
+export function getAnalyzerControlModule(): AnalyzerControlModule | undefined {
+  return modules.AnalyzerControl;
 }

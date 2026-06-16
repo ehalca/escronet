@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, X64]
     steps:
       - uses: actions/checkout@v4
 
@@ -22,7 +22,7 @@ jobs:
           context: .
           file: apps/backend/Dockerfile
           push: true
-          tags: escronet/backend:latest
+          tags: ehalca/escronet:backend
 
       - name: Build & push frontend
         uses: docker/build-push-action@v5
@@ -30,4 +30,6 @@ jobs:
           context: .
           file: apps/frontend/Dockerfile
           push: true
-          tags: escronet/frontend:latest
+          tags: ehalca/escronet:frontend
+          build-args: |
+            NEXT_PUBLIC_BACKEND_URL=escronet.com

@@ -8,46 +8,53 @@ import {
   StatusBar,
   ScrollView,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { MMKV } from "react-native-mmkv";
-import type { CallerDeltaRecord } from "@escronet/shared";
 import { syncCallers } from "../services/migrationService";
-import { getAllCallers } from "../storage/callerStore";
+import { getAnalyzerControlModule } from "../native/modules";
 
-const storage = new MMKV({ id: "migration" });
+const migrationStorage = new MMKV({ id: "migration" });
+const settingsStorage = new MMKV({ id: "settings" });
+
+const ANALYZER_ENABLED_KEY = "analyzerEnabled";
 
 export function HomeScreen(): React.JSX.Element {
   const { t } = useTranslation();
-  const [protectionEnabled, setProtectionEnabled] = useState(true);
+  const [protectionEnabled, setProtectionEnabled] = useState(
+    () => settingsStorage.getBoolean(ANALYZER_ENABLED_KEY) ?? true,
+  );
   const [refreshing, setRefreshing] = useState(false);
-  const [lastSyncAt, setLastSyncAt] = useState(storage.getString("lastSyncAt"));
-  const [callers, setCallers] = useState<CallerDeltaRecord[]>([]);
+  const [lastSyncAt, setLastSyncAt] = useState(migrationStorage.getString("lastSyncAt"));
 
   const lastSyncLabel = lastSyncAt
     ? new Date(lastSyncAt).toLocaleTimeString()
     : t("home.never");
 
-  const loadCallers = useCallback(async () => {
-    setCallers(await getAllCallers());
+  useEffect(() => {
+    void syncCallers();
   }, []);
 
-  useEffect(() => {
-    void loadCallers();
-  }, [loadCallers]);
+  const handleProtectionToggle = useCallback((value: boolean) => {
+    setProtectionEnabled(value);
+    settingsStorage.set(ANALYZER_ENABLED_KEY, value);
+    if (Platform.OS === "android") {
+      void getAnalyzerControlModule()?.setEnabled(value);
+    }
+  }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
       await syncCallers();
-      setLastSyncAt(storage.getString("lastSyncAt"));
-      await loadCallers();
+      setLastSyncAt(migrationStorage.getString("lastSyncAt"));
     } catch {
       // sync failure is non-fatal; user can try again
     } finally {
       setRefreshing(false);
     }
-  }, [loadCallers]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -75,7 +82,7 @@ export function HomeScreen(): React.JSX.Element {
           </Text>
           <Switch
             value={protectionEnabled}
-            onValueChange={setProtectionEnabled}
+            onValueChange={handleProtectionToggle}
             trackColor={{ false: "#37474F", true: "#1565C0" }}
             thumbColor={protectionEnabled ? "#4FC3F7" : "#607D8B"}
             style={styles.toggle}
@@ -85,35 +92,6 @@ export function HomeScreen(): React.JSX.Element {
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>{t("home.lastSync")}</Text>
           <Text style={styles.infoValue}>{lastSyncLabel}</Text>
-        </View>
-
-        {/* DEV: caller store inspector */}
-        <View style={styles.debugCard}>
-          <Text style={styles.debugTitle}>
-            Callers in store ({callers.length})
-          </Text>
-          <View style={styles.debugHeaderRow}>
-            <Text style={[styles.debugCell, styles.debugHeader, { flex: 2 }]}>Phone</Text>
-            <Text style={[styles.debugCell, styles.debugHeader, { flex: 1 }]}>Risk</Text>
-            <Text style={[styles.debugCell, styles.debugHeader, { flex: 2 }]}>Updated</Text>
-          </View>
-          {callers.length === 0 ? (
-            <Text style={styles.debugEmpty}>No callers synced yet</Text>
-          ) : (
-            callers.map((c) => (
-              <View key={c.id} style={styles.debugRow}>
-                <Text style={[styles.debugCell, { flex: 2 }]} numberOfLines={1}>
-                  {c.phoneNumber}
-                </Text>
-                <Text style={[styles.debugCell, styles.debugRisk, { flex: 1 }]} numberOfLines={1}>
-                  {c.riskLevel}
-                </Text>
-                <Text style={[styles.debugCell, styles.debugMuted, { flex: 2 }]} numberOfLines={1}>
-                  {new Date(c.updatedAt).toLocaleTimeString()}
-                </Text>
-              </View>
-            ))
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -163,20 +141,4 @@ const styles = StyleSheet.create({
   },
   infoLabel: { color: "#90A4AE", fontSize: 14 },
   infoValue: { color: "#FFFFFF", fontSize: 14, fontWeight: "600" },
-  debugCard: {
-    backgroundColor: "#0F2A40",
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#1E3A5F",
-    gap: 4,
-  },
-  debugTitle: { color: "#4FC3F7", fontSize: 13, fontWeight: "700", marginBottom: 4 },
-  debugHeaderRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#1E3A5F", paddingBottom: 4, marginBottom: 2 },
-  debugRow: { flexDirection: "row", paddingVertical: 3 },
-  debugCell: { color: "#FFFFFF", fontSize: 11 },
-  debugHeader: { color: "#90A4AE", fontWeight: "700" },
-  debugRisk: { color: "#FFB74D" },
-  debugMuted: { color: "#607D8B" },
-  debugEmpty: { color: "#607D8B", fontSize: 12, fontStyle: "italic", paddingVertical: 8, textAlign: "center" },
 });

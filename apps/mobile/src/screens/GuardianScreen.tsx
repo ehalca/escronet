@@ -332,9 +332,17 @@ export function GuardianScreen({ route }: Props): React.JSX.Element {
               ))}
             </>
           )}
-          <TouchableOpacity style={styles.secondaryBtn} onPress={handleScan}>
-            <Text style={styles.secondaryBtnText}>📷 {t("guardian.scanQr")}</Text>
-          </TouchableOpacity>
+          <View style={styles.rowBtns}>
+            <TouchableOpacity style={[styles.secondaryBtn, styles.flex1]} onPress={handleScan}>
+              <Text style={styles.secondaryBtnText}>📷 {t("guardian.scanQr")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.secondaryBtn, styles.flex1]}
+              onPress={() => setScanModal({ visible: true, code: "", userLabel: "", guardianLabel: "" })}
+            >
+              <Text style={styles.secondaryBtnText}># {t("guardian.enterCode")}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
