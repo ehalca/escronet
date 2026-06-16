@@ -32,4 +32,4 @@ jobs:
           push: true
           tags: ehalca/escronet:frontend
           build-args: |
-            NEXT_PUBLIC_BACKEND_URL=escronet.com
+            NEXT_PUBLIC_BACKEND_URL=https://escronet.com

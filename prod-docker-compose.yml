@@ -9,7 +9,7 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data
     env_file:
-      - ${HOME}/escronet/prod.env
+      - ./prod.env
 
   backend:
     image: ehalca/escronet:backend
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
-      - ${HOME}/escronet/prod.env
+      - ./prod.env
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -37,7 +37,7 @@ services:
       PORT: 3011
       NODE_ENV: production
     env_file:
-      - ${HOME}/escronet/prod.env
+      - ./prod.env
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -75,3 +75,4 @@ services:
     command: --interval 30 --label-enable
     environment:
       WATCHTOWER_CLEANUP: "true"
+      DOCKER_API_VERSION: "1.45"
