@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
@@ -9,9 +7,9 @@ services:
       POSTGRES_DB: escronet
       # POSTGRES_PASSWORD is read from prod.env
     volumes:
-      - ~/escronet/postgres:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
     env_file:
-      - ~/escronet/prod.env
+      - ${HOME}/escronet/prod.env
 
   backend:
     image: ehalca/escronet:backend
@@ -26,9 +24,9 @@ services:
       DB_NAME: escronet
       NODE_ENV: production
     volumes:
-      - ~/escronet/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
+      - ./firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
-      - ~/escronet/prod.env
+      - ${HOME}/escronet/prod.env
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -39,7 +37,7 @@ services:
       PORT: 3011
       NODE_ENV: production
     env_file:
-      - ~/escronet/prod.env
+      - ${HOME}/escronet/prod.env
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -50,9 +48,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ~/escronet/nginx/conf.d:/etc/nginx/conf.d:ro
-      - ~/escronet/certbot/www:/var/www/certbot:ro
-      - ~/escronet/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
     depends_on:
       - backend
       - frontend
@@ -60,8 +58,8 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      - ~/escronet/certbot/www:/var/www/certbot
-      - ~/escronet/certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
     entrypoint: >
       sh -c "trap exit TERM;
              while :; do

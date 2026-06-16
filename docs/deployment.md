@@ -81,7 +81,7 @@ newgrp docker
 ### SSH copy commands (run from the repo root on your local machine)
 
 ```bash
-SERVER=user@your-server.com
+SERVER=ehalca@192.168.0.112
 
 # Create host directories
 ssh $SERVER "mkdir -p ~/escronet/{nginx/conf.d,certbot/{www,conf},postgres}"
@@ -111,12 +111,12 @@ Non-secret config is defined inline in [prod-docker-compose.yml](../prod-docker-
 
 Use [prod.env.example](../prod.env.example) as a template. Required values:
 
-| Variable | Description |
-|---|---|
-| `DB_PASSWORD` | Postgres password used by the backend |
-| `POSTGRES_PASSWORD` | Same value as `DB_PASSWORD` — read by the `postgres` Docker image |
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | Path to the Firebase JSON file inside the container (`/run/secrets/firebase-service-account.json`) |
-| `NEXT_PUBLIC_BACKEND_URL` | Public HTTPS URL of the backend, baked into the Next.js bundle at build time (e.g. `https://yourdomain.com`) |
+| Variable                        | Description                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `DB_PASSWORD`                   | Postgres password used by the backend                                                                        |
+| `POSTGRES_PASSWORD`             | Same value as `DB_PASSWORD` — read by the `postgres` Docker image                                            |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Path to the Firebase JSON file inside the container (`/run/secrets/firebase-service-account.json`)           |
+| `NEXT_PUBLIC_BACKEND_URL`       | Public HTTPS URL of the backend, baked into the Next.js bundle at build time (e.g. `https://yourdomain.com`) |
 
 ### Firebase service account
 
