@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -71,9 +72,10 @@ export function GuardianScreen({ route }: Props): React.JSX.Element {
   });
 
   // ── TanStack Query ──────────────────────────────────────────────────────────
-  const guardiansQ   = useQuery({ queryKey: KEYS.guardians,    queryFn: () => api.guardians.list() });
+  // My Guardians and pending links are Android-only — call detection is required for alerts.
+  const guardiansQ   = useQuery({ queryKey: KEYS.guardians,    queryFn: () => api.guardians.list(),         enabled: Platform.OS === "android" });
   const guardedUsersQ = useQuery({ queryKey: KEYS.guardedUsers, queryFn: () => api.guardians.listGuarding() });
-  const linksQ       = useQuery({ queryKey: KEYS.links,        queryFn: () => api.guardianLinks.list() });
+  const linksQ       = useQuery({ queryKey: KEYS.links,        queryFn: () => api.guardianLinks.list(),     enabled: Platform.OS === "android" });
 
   const invalidateAll = () => {
     void queryClient.invalidateQueries({ queryKey: KEYS.guardians });
@@ -257,52 +259,54 @@ export function GuardianScreen({ route }: Props): React.JSX.Element {
           </TouchableOpacity>
         )}
 
-        {/* ── My Guardians ── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t("guardian.myGuardians")}</Text>
-          {loading ? <ActivityIndicator color="#4FC3F7" style={styles.loader} /> : (
-            <>
-              {guardians.length === 0 && pendingLinks.length === 0 && (
-                <View style={styles.emptyCard}>
-                  <Text style={styles.emptyTitle}>{t("guardian.noGuardians")}</Text>
-                  <Text style={styles.emptyBody}>{t("guardian.noGuardiansSub")}</Text>
-                </View>
-              )}
-              {guardians.map((g) => (
-                <View key={g.id} style={styles.row}>
-                  <TouchableOpacity style={styles.rowInfo} onPress={() => handleUpdateLabel(g.id, g.userLabel)}>
-                    <Text style={styles.rowName}>{g.userLabel ?? t("guardian.unnamed")}</Text>
-                    <Text style={styles.rowSub}>{t("guardian.tapToRename")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.removeBtn} onPress={() => handleRemoveGuardian(g.id)}>
-                    <Text style={styles.removeBtnText}>{t("guardian.removeGuardian")}</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-              {pendingLinks.map((l) => (
-                <View key={l.id} style={[styles.row, styles.pendingRow]}>
-                  <View style={styles.rowInfo}>
-                    <Text style={styles.pendingCode}>{l.code}</Text>
-                    <Text style={styles.rowSub}>{t("guardian.pendingLink")}</Text>
+        {/* ── My Guardians (Android only — requires call detection) ── */}
+        {Platform.OS === "android" && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t("guardian.myGuardians")}</Text>
+            {loading ? <ActivityIndicator color="#4FC3F7" style={styles.loader} /> : (
+              <>
+                {guardians.length === 0 && pendingLinks.length === 0 && (
+                  <View style={styles.emptyCard}>
+                    <Text style={styles.emptyTitle}>{t("guardian.noGuardians")}</Text>
+                    <Text style={styles.emptyBody}>{t("guardian.noGuardiansSub")}</Text>
                   </View>
-                  <TouchableOpacity style={styles.removeBtn}
-                    onPress={() => removeLinkMutation.mutate(l.id)}
-                    disabled={removeLinkMutation.isPending}>
-                    <Text style={styles.removeBtnText}>{t("guardian.cancel")}</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </>
-          )}
-          <TouchableOpacity
-            style={[styles.primaryBtn, generateMutation.isPending && styles.disabledBtn]}
-            onPress={() => generateMutation.mutate()}
-            disabled={generateMutation.isPending}>
-            {generateMutation.isPending
-              ? <ActivityIndicator color="#fff" />
-              : <Text style={styles.primaryBtnText}>+ {t("guardian.addGuardian")}</Text>}
-          </TouchableOpacity>
-        </View>
+                )}
+                {guardians.map((g) => (
+                  <View key={g.id} style={styles.row}>
+                    <TouchableOpacity style={styles.rowInfo} onPress={() => handleUpdateLabel(g.id, g.userLabel)}>
+                      <Text style={styles.rowName}>{g.userLabel ?? t("guardian.unnamed")}</Text>
+                      <Text style={styles.rowSub}>{t("guardian.tapToRename")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.removeBtn} onPress={() => handleRemoveGuardian(g.id)}>
+                      <Text style={styles.removeBtnText}>{t("guardian.removeGuardian")}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                {pendingLinks.map((l) => (
+                  <View key={l.id} style={[styles.row, styles.pendingRow]}>
+                    <View style={styles.rowInfo}>
+                      <Text style={styles.pendingCode}>{l.code}</Text>
+                      <Text style={styles.rowSub}>{t("guardian.pendingLink")}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.removeBtn}
+                      onPress={() => removeLinkMutation.mutate(l.id)}
+                      disabled={removeLinkMutation.isPending}>
+                      <Text style={styles.removeBtnText}>{t("guardian.cancel")}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
+            <TouchableOpacity
+              style={[styles.primaryBtn, generateMutation.isPending && styles.disabledBtn]}
+              onPress={() => generateMutation.mutate()}
+              disabled={generateMutation.isPending}>
+              {generateMutation.isPending
+                ? <ActivityIndicator color="#fff" />
+                : <Text style={styles.primaryBtnText}>+ {t("guardian.addGuardian")}</Text>}
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* ── I Am a Guardian ── */}
         <View style={styles.section}>

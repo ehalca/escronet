@@ -1,0 +1,83 @@
+name: TestFlight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+
+jobs:
+  testflight:
+    name: Build & upload to TestFlight
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: Install Ruby gems (fastlane)
+        run: bundle install
+
+      - name: Restore signing assets
+        run: |
+          mkdir -p fastlane
+          # Distribution certificate (.p12)
+          echo "${{ secrets.DISTRIBUTION_CERT_P12 }}" | base64 --decode \
+            > fastlane/distribution.p12
+          # Provisioning profile
+          echo "${{ secrets.PROVISIONING_PROFILE }}" | base64 --decode \
+            > fastlane/Escronet_App_Store.mobileprovision
+          # App Store Connect API key
+          echo '{
+            "key_id": "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}",
+            "issuer_id": "${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}",
+            "key": "${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}",
+            "in_house": false
+          }' > fastlane/api_key.json
+          # Firebase config
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 --decode \
+            > ios/EscronetApp/GoogleService-Info.plist
+
+      - name: Generate Xcode project (if not committed)
+        run: |
+          if [ ! -f "ios/EscronetApp.xcodeproj/project.pbxproj" ]; then
+            gem install xcodeproj --no-document
+            chmod +x scripts/ios-scaffold.sh
+            ./scripts/ios-scaffold.sh
+          fi
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: apps/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods
+        run: pod install
+        working-directory: apps/mobile/ios
+
+      - name: Build & upload to TestFlight
+        env:
+          DISTRIBUTION_CERT_PASSWORD: ${{ secrets.DISTRIBUTION_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ vars.ITC_TEAM_ID }}
+          APPLE_ID: ${{ vars.APPLE_ID }}
+        run: bundle exec fastlane beta

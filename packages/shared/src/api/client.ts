@@ -4,6 +4,8 @@ import {
   ListMyAlertsResponseSchema,
   ListAlertNotificationsResponseSchema,
 } from "../schemas/alert.schema";
+import { CallerCheckInputSchema, CallerCheckResultSchema, PublicStatsSchema } from "../schemas/stats.schema";
+import type { CallerCheckInput } from "../schemas/stats.schema";
 import type { CreateAlertInput, UpdateAlertStatusInput, UpdateAlertRiskInput } from "../schemas/alert.schema";
 import { AuthResponseSchema } from "../schemas/auth.schema";
 import type { RegisterDeviceInput } from "../schemas/auth.schema";
@@ -138,6 +140,12 @@ export function createApiClient(
         call(baseUrl, "PATCH", `/guardians/${id}/label`, z.void(), t, { ...opts, body: { label } }),
       remove: (id: string, opts?: Pick<CallOpts, "version">) =>
         call(baseUrl, "DELETE", `/guardians/${id}`, z.void(), t, opts),
+    },
+    stats: {
+      public: (opts?: Pick<CallOpts, "version">) =>
+        call(baseUrl, "GET", "/stats/public", PublicStatsSchema, null, opts),
+      callerCheck: (body: CallerCheckInput, opts?: Pick<CallOpts, "version">) =>
+        call(baseUrl, "POST", "/stats/caller-check", CallerCheckResultSchema, null, { ...opts, body }),
     },
     alerts: {
       create: (body: CreateAlertInput, opts?: Pick<CallOpts, "version">) =>

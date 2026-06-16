@@ -91,5 +91,8 @@ export type {
   IListAlertNotificationsResponse,
 } from "./interfaces/alert.interface";
 
+export { PublicStatsSchema, CallerCheckInputSchema, CallerCheckResultSchema } from "./schemas/stats.schema";
+export type { PublicStats, CallerCheckInput, CallerCheckResult } from "./schemas/stats.schema";
+
 export { createApiClient } from "./api/client";
 export type { ApiClient } from "./api/client";

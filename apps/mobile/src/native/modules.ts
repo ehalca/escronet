@@ -30,6 +30,7 @@ const modules = NativeModules as {
   WhisperModule?: WhisperModule;
   ClassifierModule?: ClassifierModule;
   CallKitModule?: IOSCallKitModule;
+  IOSCallMonitorModule?: Record<string, unknown>;
 };
 
 export function requireAndroidCallMonitor(): AndroidCallMonitorModule {
@@ -37,6 +38,11 @@ export function requireAndroidCallMonitor(): AndroidCallMonitorModule {
     throw new Error("CallMonitorModule is only available on Android");
   }
   return modules.CallMonitorModule;
+}
+
+/** Returns true when the iOS native call observer is linked and active. */
+export function hasIOSCallMonitor(): boolean {
+  return Platform.OS === "ios" && modules.IOSCallMonitorModule != null;
 }
 
 export function requireWhisperModule(): WhisperModule {

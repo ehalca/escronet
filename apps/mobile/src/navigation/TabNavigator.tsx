@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { TabParamList } from "./types";
 import { HomeScreen } from "../screens/HomeScreen";
@@ -38,7 +38,10 @@ export function TabNavigator(): React.JSX.Element {
         ),
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t("tabs.home") }} />
+      {/* Home tab is Android-only: call monitoring has no iOS implementation yet */}
+      {Platform.OS === "android" && (
+        <Tab.Screen name="Home" component={HomeScreen} options={{ title: t("tabs.home") }} />
+      )}
       <Tab.Screen name="Alerts" component={AlertsScreen} options={{ title: t("tabs.alerts") }} />
       <Tab.Screen name="Settings" component={SettingsStack} options={{ title: t("tabs.settings") }} />
     </Tab.Navigator>

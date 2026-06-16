@@ -1,0 +1,49 @@
+default_platform :ios
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    setup_ci if ENV["CI"]
+
+    create_keychain(
+      name: "ci_keychain",
+      password: ENV["KEYCHAIN_PASSWORD"],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+    )
+
+    import_certificate(
+      certificate_path: "fastlane/distribution.p12",
+      certificate_password: ENV["DISTRIBUTION_CERT_PASSWORD"],
+      keychain_name: "ci_keychain",
+      keychain_password: ENV["KEYCHAIN_PASSWORD"],
+    )
+
+    install_provisioning_profile(
+      path: "fastlane/Escronet_App_Store.mobileprovision",
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/EscronetApp.xcodeproj",
+      code_sign_identity: "Apple Distribution",
+      profile_name: "Escronet App Store",
+    )
+
+    gym(
+      workspace: "ios/EscronetApp.xcworkspace",
+      scheme: "EscronetApp",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build",
+      output_name: "EscronetApp.ipa",
+    )
+
+    pilot(
+      api_key_path: "fastlane/api_key.json",
+      skip_waiting_for_build_processing: true,
+      distribute_external: false,
+    )
+  end
+end

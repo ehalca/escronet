@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, DeviceEventEmitter, StyleSheet, Text, View } from "react-native";
+import { Animated, DeviceEventEmitter, Platform, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 const EVENT_SMS_OTP = "sms_otp_during_call";
+// iOS has no SMS interception — use risk_escalated (from the ONNX classifier) as trigger instead.
+const EVENT_RISK_ESCALATED = "risk_escalated";
 const EVENT_CALL_ENDED = "call_ended";
 
 export function SmsOtpBanner(): React.JSX.Element | null {
@@ -12,9 +14,16 @@ export function SmsOtpBanner(): React.JSX.Element | null {
 
   useEffect(() => {
     const show = DeviceEventEmitter.addListener(EVENT_SMS_OTP, () => setVisible(true));
+    // On iOS, the banner is triggered by the classifier detecting a scam transcript
+    // rather than by an OTP SMS (which iOS cannot intercept).
+    const showIos =
+      Platform.OS === "ios"
+        ? DeviceEventEmitter.addListener(EVENT_RISK_ESCALATED, () => setVisible(true))
+        : null;
     const hide = DeviceEventEmitter.addListener(EVENT_CALL_ENDED, () => setVisible(false));
     return () => {
       show.remove();
+      showIos?.remove();
       hide.remove();
     };
   }, []);
@@ -38,7 +47,9 @@ export function SmsOtpBanner(): React.JSX.Element | null {
       <Animated.View style={[styles.card, { opacity: pulse }]}>
         <Text style={styles.icon}>⚠</Text>
         <Text style={styles.title}>{t("smsBanner.title")}</Text>
-        <Text style={styles.body}>{t("smsBanner.body")}</Text>
+        <Text style={styles.body}>
+          {t(Platform.OS === "ios" ? "smsBanner.bodyIos" : "smsBanner.body")}
+        </Text>
       </Animated.View>
     </View>
   );

@@ -49,12 +49,13 @@ export function AppNavigator(): React.JSX.Element {
   const openAlertsOnReadyRef = useRef(false);
 
   useEffect(() => {
-    const stopCallListener = startCallEventListener();
+    // Call event listener is Android-only — no native call detection on iOS yet.
+    const stopCallListener = Platform.OS === "android" ? startCallEventListener() : undefined;
     const stopTokenRefresh = listenForTokenRefresh();
     const stopForegroundMessages = listenForForegroundMessages();
     const stopNotificationPress = listenForNotificationPress();
     return () => {
-      stopCallListener();
+      stopCallListener?.();
       stopTokenRefresh();
       stopForegroundMessages();
       stopNotificationPress();
@@ -69,11 +70,14 @@ export function AppNavigator(): React.JSX.Element {
         await createNotificationChannels();
         await ensureAuthenticated();
         disconnectWs = await connectWs();
-        await initMigration();
-        await syncIfStale();
-        // RECEIVE_SMS — dangerous permission, must be requested at runtime.
-        // Required so the Kotlin service can intercept SMS during an active call.
+        // Caller sync feeds the Android call detection pipeline — skip on iOS.
         if (Platform.OS === "android") {
+          await initMigration();
+          await syncIfStale();
+        }
+        if (Platform.OS === "android") {
+          // RECEIVE_SMS — dangerous permission required so the Kotlin service
+          // can intercept SMS during an active call to detect OTP codes.
           await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
             {
@@ -84,13 +88,13 @@ export function AppNavigator(): React.JSX.Element {
               buttonNegative: "Deny",
             },
           ).catch(() => null);
-        }
 
-        // Request "Display over other apps" permission so the system overlay
-        // can be shown over the phone dialer when an OTP SMS arrives mid-call.
-        if (OverlayPermission) {
-          const granted = await OverlayPermission.isGranted().catch(() => true);
-          if (!granted) OverlayPermission.requestPermission();
+          // Request "Display over other apps" permission so the system overlay
+          // can appear over the phone dialer when an OTP SMS arrives mid-call.
+          if (OverlayPermission) {
+            const granted = await OverlayPermission.isGranted().catch(() => true);
+            if (!granted) OverlayPermission.requestPermission();
+          }
         }
 
         // Check if the app was launched by tapping a notification (quit/background state)
@@ -123,6 +127,8 @@ export function AppNavigator(): React.JSX.Element {
 
   return (
     <View style={{ flex: 1 }}>
+      {/* SmsOtpBanner requires call + SMS detection — Android only for now */}
+      {Platform.OS === "android" && <SmsOtpBanner />}
       <NavigationContainer
         ref={navigationRef}
         linking={linking}
@@ -137,7 +143,6 @@ export function AppNavigator(): React.JSX.Element {
           <Stack.Screen name="MainTabs" component={TabNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
-      <SmsOtpBanner />
     </View>
   );
 }

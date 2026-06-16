@@ -90,6 +90,95 @@
   },
   "smsBanner": {
     "title": "SCAM ALERT",
-    "body": "You received an OTP code while on a call with an unknown number. Do NOT share it."
+    "body": "You received an OTP code while on a call with an unknown number. Do NOT share it.",
+    "bodyIos": "Suspicious activity detected on this call. Do NOT share any codes or personal information."
+  },
+  "landing": {
+    "nav": {
+      "download": "Download"
+    },
+    "hero": {
+      "headline": "Stop Scam Calls Before They Happen",
+      "subhead": "Escronet listens on-device, transcribes in real time, and alerts you — and a trusted guardian — the moment a call turns suspicious.",
+      "ctaAndroid": "Get on Android",
+      "ctaIos": "Coming to iOS"
+    },
+    "features": {
+      "title": "Why Escronet?",
+      "privacy": {
+        "title": "Privacy First",
+        "body": "All transcription and AI classification runs entirely on your device. No audio, text, or personal data ever leaves your phone."
+      },
+      "openSource": {
+        "title": "Open Source",
+        "body": "The full codebase is publicly auditable on GitHub. No black boxes, no hidden telemetry — just code you can verify yourself."
+      },
+      "free": {
+        "title": "Completely Free",
+        "body": "No subscriptions, no premium tiers, no data harvesting. Escronet is free because protecting people shouldn't have a price."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1Title": "Call Detected",
+      "step1Body": "Escronet notices an incoming call from an unknown number and begins monitoring.",
+      "step2Title": "On-Device Transcription",
+      "step2Body": "Whisper runs locally on your phone, converting speech to text — nothing is sent to the cloud.",
+      "step3Title": "Instant Alert",
+      "step3Body": "An ONNX classifier scores the transcript. If it looks like a scam, you and your guardian are alerted immediately."
+    },
+    "stats": {
+      "title": "Growing Every Day",
+      "subtitle": "Real numbers, updated live.",
+      "users": "Protected Users",
+      "guardians": "Active Guardians",
+      "alertsTitle": "Alerts by Risk Level",
+      "lowest": "Minimal",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "highest": "Critical"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How does Escronet detect scam calls?",
+      "a1": "When a call comes in from an unknown number, Escronet records audio locally and runs it through an on-device Whisper model to transcribe speech in real time. The transcript is scored by an ONNX classifier trained on scam patterns. If the score crosses a risk threshold, you receive an immediate local alert.",
+      "q2": "Does Escronet send my call audio to a server?",
+      "a2": "No. All audio processing happens entirely on your device. No audio, transcripts, or personal data are ever uploaded to any server. The only data that reaches our backend is an anonymised risk event used to notify your guardian.",
+      "q3": "What is a Guardian?",
+      "a3": "A Guardian is a trusted contact — a family member or friend — who receives a push notification whenever your device detects a high-risk call. They can monitor your alerts in real time through the Escronet app.",
+      "q4": "Is Escronet available on iPhone?",
+      "a4": "Android support is fully available now. An iOS version scoped to Guardian features (receiving alerts for people you protect) is in active development.",
+      "q5": "Is Escronet free?",
+      "a5": "Yes, completely free. There are no subscriptions, in-app purchases, or premium tiers. We don't sell your data either.",
+      "q6": "Is the code open source?",
+      "a6": "Yes. The full codebase is available on GitHub. You can audit the code, open issues, or contribute.",
+      "q7": "What permissions does Escronet need?",
+      "a7": "On Android: phone state (to detect calls), microphone (to transcribe audio), contacts (to identify unknown callers), and SMS (to detect OTP codes sent during calls). All processing stays on-device.",
+      "q8": "How do I set up a Guardian?",
+      "a8": "Go to Settings → Guardian Setup and tap 'Add Guardian'. Share the generated QR code with your trusted contact. Once they scan it with their Escronet app, they become your guardian and will receive alerts for your calls."
+    },
+    "phoneCheck": {
+      "title": "Check a Phone Number",
+      "subtitle": "See if a number has been reported for scam activity across our network.",
+      "placeholder": "+1 555 000 0000",
+      "cta": "Check Number",
+      "checking": "Checking…",
+      "hint": "Include country code (e.g. +1, +40, +7)",
+      "resultClean": "No reports found",
+      "resultCleanSub": "This number has no scam reports in our database.",
+      "resultWarning": "Reported as suspicious",
+      "resultWarning_banned": "Flagged in our caller database",
+      "totalAlerts": "Total alerts across all users",
+      "alertsByLevel": "Alert breakdown by risk level",
+      "riskLevel": "Risk level",
+      "noAlerts": "No alerts on record for this number."
+    },
+    "footer": {
+      "tagline": "On-device scam call protection.",
+      "github": "GitHub",
+      "privacy": "Privacy Policy",
+      "copyright": "© {{year}} Escronet. Open source."
+    }
   }
 }

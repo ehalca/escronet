@@ -158,3 +158,11 @@ apps/backend/dist/
 prod.env
 apps/backend/escronet-dev.json
 apps/mobile/android/app/google-services.json
+apps/mobile/ios/EscronetApp/GoogleService-Info.plist
+
+# Fastlane — generated at CI runtime from secrets, never commit
+apps/mobile/fastlane/api_key.json
+apps/mobile/fastlane/distribution.p12
+apps/mobile/fastlane/Escronet_App_Store.mobileprovision
+apps/mobile/build/
+apps/mobile/Gemfile.lock

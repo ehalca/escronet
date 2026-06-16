@@ -17,6 +17,7 @@ import { FirebaseModule } from "./modules/firebase/firebase.module";
 import { GuardianEventsModule } from "./gateway/guardian-events.module";
 import { GuardianLinksModule } from "./modules/guardian-links/guardian-links.module";
 import { GuardiansModule } from "./modules/guardians/guardians.module";
+import { StatsModule } from "./modules/stats/stats.module";
 import { FirebaseAuthGuard } from "./common/auth.guard";
 import { HealthController } from "./controllers/health.controller";
 
@@ -45,6 +46,7 @@ import { HealthController } from "./controllers/health.controller";
     GuardianEventsModule,
     GuardianLinksModule,
     GuardiansModule,
+    StatsModule,
   ],
   controllers: [HealthController],
   providers: [

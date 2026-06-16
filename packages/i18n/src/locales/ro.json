@@ -90,6 +90,95 @@
   },
   "smsBanner": {
     "title": "ALERTĂ FRAUDĂ",
-    "body": "Ai primit un cod OTP în timp ce vorbeai cu un număr necunoscut. NU îl comunica nimănui."
+    "body": "Ai primit un cod OTP în timp ce vorbeai cu un număr necunoscut. NU îl comunica nimănui.",
+    "bodyIos": "Activitate suspectă detectată în acest apel. NU comunica niciun cod sau informație personală."
+  },
+  "landing": {
+    "nav": {
+      "download": "Descarcă"
+    },
+    "hero": {
+      "headline": "Oprește Apelurile Frauduloase Înainte să Se Întâmple",
+      "subhead": "Escronet ascultă pe dispozitiv, transcrie în timp real și te alertează — pe tine și un guardian de încredere — în momentul în care un apel devine suspect.",
+      "ctaAndroid": "Descarcă pe Android",
+      "ctaIos": "Disponibil curând pe iOS"
+    },
+    "features": {
+      "title": "De ce Escronet?",
+      "privacy": {
+        "title": "Confidențialitate în Prim Plan",
+        "body": "Transcrierea și clasificarea AI se execută complet pe dispozitivul tău. Niciun audio, text sau date personale nu părăsesc vreodată telefonul."
+      },
+      "openSource": {
+        "title": "Sursă Deschisă",
+        "body": "Codul sursă complet este auditabil public pe GitHub. Fără cutii negre, fără telemetrie ascunsă — doar cod pe care îl poți verifica singur."
+      },
+      "free": {
+        "title": "Complet Gratuit",
+        "body": "Fără abonamente, fără niveluri premium, fără colectare de date. Escronet este gratuit pentru că protejarea oamenilor nu ar trebui să aibă un preț."
+      }
+    },
+    "howItWorks": {
+      "title": "Cum Funcționează",
+      "step1Title": "Apel Detectat",
+      "step1Body": "Escronet detectează un apel primit de la un număr necunoscut și începe monitorizarea.",
+      "step2Title": "Transcriere pe Dispozitiv",
+      "step2Body": "Whisper rulează local pe telefonul tău, convertind vorbirea în text — nimic nu este trimis în cloud.",
+      "step3Title": "Alertă Imediată",
+      "step3Body": "Un clasificator ONNX evaluează transcriptul. Dacă pare a fi o fraudă, tu și guardianul tău sunteți alertați imediat."
+    },
+    "stats": {
+      "title": "În Creștere Zilnică",
+      "subtitle": "Cifre reale, actualizate în direct.",
+      "users": "Utilizatori Protejați",
+      "guardians": "Gardieni Activi",
+      "alertsTitle": "Alerte pe Nivel de Risc",
+      "lowest": "Minimal",
+      "low": "Scăzut",
+      "medium": "Mediu",
+      "high": "Ridicat",
+      "highest": "Critic"
+    },
+    "faq": {
+      "title": "Întrebări Frecvente",
+      "q1": "Cum detectează Escronet apelurile frauduloase?",
+      "a1": "Când vine un apel de la un număr necunoscut, Escronet înregistrează audio local și îl procesează printr-un model Whisper pe dispozitiv pentru a transcrie vorbirea în timp real. Transcriptul este evaluat de un clasificator ONNX antrenat pe tipare de fraudă. Dacă scorul depășește un prag de risc, primești o alertă locală imediată.",
+      "q2": "Escronet trimite înregistrările apelurilor mele pe un server?",
+      "a2": "Nu. Toată procesarea audio are loc complet pe dispozitivul tău. Niciun audio, transcript sau date personale nu sunt vreodată încărcate pe vreun server. Singurul dat care ajunge la backend-ul nostru este un eveniment de risc anonimizat folosit pentru a notifica guardianul tău.",
+      "q3": "Ce este un Guardian?",
+      "a3": "Un Guardian este un contact de încredere — un membru al familiei sau un prieten — care primește o notificare push ori de câte ori dispozitivul tău detectează un apel cu risc ridicat. Poate monitoriza alertele tale în timp real prin aplicația Escronet.",
+      "q4": "Este Escronet disponibil pe iPhone?",
+      "a4": "Suportul Android este complet disponibil acum. O versiune iOS axată pe funcțiile Guardian (primirea alertelor pentru persoanele pe care le protejezi) este în curs de dezvoltare activă.",
+      "q5": "Este Escronet gratuit?",
+      "a5": "Da, complet gratuit. Nu există abonamente, achiziții în aplicație sau niveluri premium. Nu vindem nici datele tale.",
+      "q6": "Codul este open source?",
+      "a6": "Da. Codul sursă complet este disponibil pe GitHub. Poți audita codul, deschide probleme sau contribui.",
+      "q7": "Ce permisiuni are nevoie Escronet?",
+      "a7": "Pe Android: starea telefonului (pentru detectarea apelurilor), microfon (pentru transcrierea audio), contacte (pentru identificarea apelantilor necunoscuți) și SMS (pentru detectarea codurilor OTP trimise în timpul apelurilor). Toată procesarea rămâne pe dispozitiv.",
+      "q8": "Cum configurez un Guardian?",
+      "a8": "Mergi la Setări → Configurare Guardian și apasă 'Adaugă Guardian'. Distribuie codul QR generat contactului tău de încredere. Odată ce îl scanează cu aplicația Escronet, devine guardianul tău și va primi alerte pentru apelurile tale."
+    },
+    "phoneCheck": {
+      "title": "Verifică un Număr de Telefon",
+      "subtitle": "Află dacă un număr a fost raportat pentru activitate frauduloasă în rețeaua noastră.",
+      "placeholder": "+40 700 000 000",
+      "cta": "Verifică Numărul",
+      "checking": "Se verifică…",
+      "hint": "Include prefixul internațional (ex. +1, +40, +7)",
+      "resultClean": "Niciun raport găsit",
+      "resultCleanSub": "Acest număr nu are rapoarte de fraudă în baza noastră de date.",
+      "resultWarning": "Raportat ca suspect",
+      "resultWarning_banned": "Marcat în baza noastră de apeluri",
+      "totalAlerts": "Total alerte din toată rețeaua",
+      "alertsByLevel": "Distribuție alerte pe nivel de risc",
+      "riskLevel": "Nivel de risc",
+      "noAlerts": "Nicio alertă înregistrată pentru acest număr."
+    },
+    "footer": {
+      "tagline": "Protecție împotriva apelurilor frauduloase pe dispozitiv.",
+      "github": "GitHub",
+      "privacy": "Politică de confidențialitate",
+      "copyright": "© {{year}} Escronet. Sursă deschisă."
+    }
   }
 }

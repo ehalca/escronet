@@ -6,6 +6,7 @@ import {
   onTokenRefresh,
   AuthorizationStatus,
 } from "@react-native-firebase/messaging";
+import { Platform } from "react-native";
 import type { IPushService, PushMessage } from "./push.types";
 
 class FirebasePushService implements IPushService {
@@ -18,12 +19,21 @@ class FirebasePushService implements IPushService {
   }
 
   async getToken(): Promise<string | null> {
-    // FCM tokens are device-level on Android and don't require notification permission.
-    // requestPermission() is called separately — don't gate token retrieval on it.
     try {
+      // On iOS, APNs registration only completes after the user grants permission,
+      // so we must request it before calling getToken() or Firebase will throw.
+      if (Platform.OS === "ios") {
+        const status = await requestPermission(getMessaging());
+        if (
+          status !== AuthorizationStatus.AUTHORIZED &&
+          status !== AuthorizationStatus.PROVISIONAL
+        ) {
+          return null;
+        }
+      }
       return await getToken(getMessaging());
     } catch (err) {
-      console.warn("[FirebasePushService] getToken() failed — Firebase misconfigured or no Play Services:", err);
+      console.warn("[FirebasePushService] getToken() failed:", err);
       return null;
     }
   }

@@ -1,0 +1,71 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+
+jobs:
+  build:
+    name: iOS simulator build
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: Generate Xcode project (if not committed)
+        run: |
+          if [ ! -f "ios/EscronetApp.xcodeproj/project.pbxproj" ]; then
+            gem install xcodeproj --no-document
+            chmod +x scripts/ios-scaffold.sh
+            ./scripts/ios-scaffold.sh
+          fi
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: apps/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods
+        run: pod install
+        working-directory: apps/mobile/ios
+
+      - name: Build (simulator — no signing)
+        run: |
+          xcodebuild \
+            -workspace ios/EscronetApp.xcworkspace \
+            -scheme EscronetApp \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            | xcpretty --color || (cat /tmp/xcodebuild.log 2>/dev/null; exit 1)
+
+      - name: Type-check
+        run: pnpm typecheck
+        working-directory: .
