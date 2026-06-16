@@ -2,10 +2,14 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable pnpm
 
-# Layer cache — manifests only, so source changes don't bust the install layer
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/package.json ./apps/backend/
-COPY packages/shared/package.json ./packages/shared/
+# Layer cache — all manifests so pnpm can resolve the full workspace graph
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/backend/package.json  ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/mobile/package.json   ./apps/mobile/
+COPY packages/shared/package.json    ./packages/shared/
+COPY packages/shared-ui/package.json ./packages/shared-ui/
+COPY packages/i18n/package.json      ./packages/i18n/
 RUN pnpm install --frozen-lockfile
 
 # Copy source
@@ -13,9 +17,13 @@ COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
 
-# Build shared types first (backend imports from @escronet/shared/dist)
-RUN pnpm --filter @escronet/shared build:types
-RUN pnpm --filter @escronet/backend build
+# shamefully-hoist puts all binaries at root node_modules/.bin but does not
+# create workspace-level symlinks in the container, so bypass pnpm script
+# runner and call tools directly from the hoisted root bin directory.
+ENV PATH="/app/node_modules/.bin:${PATH}"
+
+RUN cd /app/packages/shared && tsc
+RUN cd /app/apps/backend && nest build
 
 # Create a production-ready bundle: copies non-dev deps and workspace packages (with their dist)
 RUN pnpm deploy --filter @escronet/backend --prod /deploy

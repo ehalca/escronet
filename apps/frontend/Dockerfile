@@ -7,12 +7,14 @@ RUN corepack enable pnpm
 ARG NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
-# Layer cache — manifests only
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Layer cache — all manifests so pnpm can resolve the full workspace graph
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/backend/package.json  ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
-COPY packages/shared/package.json ./packages/shared/
+COPY apps/mobile/package.json   ./apps/mobile/
+COPY packages/shared/package.json    ./packages/shared/
 COPY packages/shared-ui/package.json ./packages/shared-ui/
-COPY packages/i18n/package.json ./packages/i18n/
+COPY packages/i18n/package.json      ./packages/i18n/
 RUN pnpm install --frozen-lockfile
 
 # Copy source
@@ -20,9 +22,13 @@ COPY tsconfig.base.json ./
 COPY packages ./packages
 COPY apps/frontend ./apps/frontend
 
-# Build shared types (Next.js transpilePackages handles source, but shared needs dist for type resolution)
-RUN pnpm --filter @escronet/shared build:types
-RUN pnpm --filter @escronet/frontend build
+# shamefully-hoist puts all binaries at root node_modules/.bin but does not
+# create workspace-level symlinks in the container, so bypass pnpm script
+# runner and call tools directly from the hoisted root bin directory.
+ENV PATH="/app/node_modules/.bin:${PATH}"
+
+RUN cd /app/packages/shared && tsc
+RUN cd /app/apps/frontend && next build
 
 # ---- production image ----
 # With output:'standalone' + outputFileTracingRoot set to the monorepo root,
