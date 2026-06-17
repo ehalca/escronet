@@ -89,6 +89,25 @@
     "successClaimed": "You are now a guardian!",
     "successPaired": "Guardian linked successfully!"
   },
+  "notifications": {
+    "channelName": "Scam Alerts",
+    "channelDescription": "Alerts when a protected contact may be on a scam call",
+    "alertCreated": {
+      "title": "⚠ Suspicious Call",
+      "body": "{{name}} may be on a scam call right now",
+      "bodyGeneric": "A contact may be on a scam call"
+    },
+    "alertRetry": {
+      "title": "⚠ Still Active",
+      "body": "{{name}} may still be on a scam call",
+      "bodyGeneric": "A contact may still be on a scam call"
+    },
+    "riskEscalated": {
+      "title": "🚨 Risk Escalated",
+      "body": "{{name}}'s call risk has increased",
+      "bodyGeneric": "Call risk level increased"
+    }
+  },
   "smsBanner": {
     "title": "SCAM ALERT",
     "body": "You received an OTP code while on a call with an unknown number. Do NOT share it.",

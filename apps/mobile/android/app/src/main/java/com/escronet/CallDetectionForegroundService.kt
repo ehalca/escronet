@@ -104,7 +104,8 @@ class CallDetectionForegroundService : Service() {
         Log.d(TAG, "onRinging: number=$phoneNumber")
         pendingNumber = phoneNumber
         cancelAlert()
-        updateForegroundNotification("Incoming call: ${phoneNumber.ifEmpty { "Unknown" }}")
+        val label = phoneNumber.ifEmpty { getString(R.string.notification_unknown_number) }
+        updateForegroundNotification(getString(R.string.notification_incoming_call, label))
     }
 
     private fun onAnswered() {
@@ -151,8 +152,8 @@ class CallDetectionForegroundService : Service() {
             ALERT_NOTIF_ID,
             NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Unknown caller")
-                .setContentText("$phoneNumber is not in your contacts")
+                .setContentTitle(getString(R.string.notification_alert_title))
+                .setContentText(getString(R.string.notification_alert_body, phoneNumber))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .build()
@@ -289,7 +290,7 @@ class CallDetectionForegroundService : Service() {
         })
 
         root.addView(TextView(this).apply {
-            text = "SCAM ALERT"
+            text = getString(R.string.notification_otp_warning)
             textSize = 18f
             setTextColor(Color.WHITE)
             typeface = Typeface.DEFAULT_BOLD
@@ -299,7 +300,7 @@ class CallDetectionForegroundService : Service() {
         })
 
         root.addView(TextView(this).apply {
-            text = "OTP received during call with unknown number.\nDo NOT share it."
+            text = getString(R.string.notification_otp_body)
             textSize = 14f
             setTextColor(Color.parseColor("#FFCDD2"))
             gravity = Gravity.CENTER
@@ -410,8 +411,8 @@ class CallDetectionForegroundService : Service() {
         )
         return NotificationCompat.Builder(this, MONITOR_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(if (callText != null) "Call in progress" else "Escronet")
-            .setContentText(callText ?: "Monitoring for unknown callers")
+            .setContentTitle(if (callText != null) getString(R.string.notification_monitoring_active_title) else getString(R.string.notification_monitoring_idle_title))
+            .setContentText(callText ?: getString(R.string.notification_monitoring_idle_body))
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setOngoing(true)
             .setContentIntent(pi)
@@ -422,10 +423,10 @@ class CallDetectionForegroundService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             nm.createNotificationChannel(
-                NotificationChannel(MONITOR_CHANNEL_ID, "Call Monitoring", NotificationManager.IMPORTANCE_MIN)
+                NotificationChannel(MONITOR_CHANNEL_ID, getString(R.string.notification_channel_monitoring_name), NotificationManager.IMPORTANCE_MIN)
             )
             nm.createNotificationChannel(
-                NotificationChannel(ALERT_CHANNEL_ID, "Call Alerts", NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(ALERT_CHANNEL_ID, getString(R.string.notification_channel_alerts_name), NotificationManager.IMPORTANCE_HIGH)
             )
         }
     }

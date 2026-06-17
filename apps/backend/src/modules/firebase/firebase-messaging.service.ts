@@ -2,8 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { FirebaseService } from "./firebase.service";
 
 export interface PushPayload {
-  title: string;
-  body: string;
+  title?: string;
+  body?: string;
   data?: Record<string, string>;
 }
 
@@ -26,11 +26,11 @@ export class FirebaseMessagingService {
     );
     const response = await this.firebase.messaging().send({
       token: fcmToken,
-      notification: { title: payload.title, body: payload.body },
+      ...(payload.title != null ? { notification: { title: payload.title, body: payload.body } } : {}),
       data: payload.data,
       android: {
         priority: "high",
-        notification: { channelId: "escronet_alerts" },
+        ...(payload.title != null ? { notification: { channelId: "escronet_alerts" } } : {}),
       },
     });
     this.logger.log(`[sendToDevice] FCM accepted token=${tokenPrefix}… messageId=${response}`);
@@ -49,11 +49,11 @@ export class FirebaseMessagingService {
     );
     const result = await this.firebase.messaging().sendEachForMulticast({
       tokens: fcmTokens,
-      notification: { title: payload.title, body: payload.body },
+      ...(payload.title != null ? { notification: { title: payload.title, body: payload.body } } : {}),
       data: payload.data,
       android: {
         priority: "high",
-        notification: { channelId: "escronet_alerts" },
+        ...(payload.title != null ? { notification: { channelId: "escronet_alerts" } } : {}),
       },
     });
     this.logger.log(

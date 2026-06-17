@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Escronet</string>
+
+    <string name="notification_channel_monitoring_name">Monitorizare Apeluri</string>
+    <string name="notification_channel_alerts_name">Alerte Apeluri</string>
+
+    <string name="notification_monitoring_idle_title">Escronet</string>
+    <string name="notification_monitoring_idle_body">Monitorizând apelurile pentru activitate frauduloasă</string>
+    <string name="notification_monitoring_active_title">Apel în desfășurare</string>
+    <string name="notification_incoming_call">Apel primit: %1$s</string>
+    <string name="notification_unknown_number">Necunoscut</string>
+
+    <string name="notification_alert_title">Apel suspect</string>
+    <string name="notification_alert_body">%1$s nu este în contactele tale — fii atent</string>
+
+    <string name="notification_otp_warning">ALERTĂ FRAUDĂ</string>
+    <string name="notification_otp_body">Ai primit un cod unic în timpul unui apel cu un număr necunoscut. NU îl comunica nimănui.</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Escronet</string>
+
+    <string name="notification_channel_monitoring_name">Мониторинг звонков</string>
+    <string name="notification_channel_alerts_name">Оповещения</string>
+
+    <string name="notification_monitoring_idle_title">Escronet</string>
+    <string name="notification_monitoring_idle_body">Мониторинг входящих звонков</string>
+    <string name="notification_monitoring_active_title">Звонок активен</string>
+    <string name="notification_incoming_call">Входящий звонок: %1$s</string>
+    <string name="notification_unknown_number">Неизвестный</string>
+
+    <string name="notification_alert_title">Подозрительный звонок</string>
+    <string name="notification_alert_body">%1$s не в ваших контактах — будьте осторожны</string>
+
+    <string name="notification_otp_warning">МОШЕННИЧЕСТВО</string>
+    <string name="notification_otp_body">Вы получили одноразовый код во время звонка с неизвестным номером. НЕ сообщайте его.</string>
+</resources>

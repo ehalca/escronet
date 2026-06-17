@@ -89,6 +89,25 @@
     "successClaimed": "Ești acum guardian!",
     "successPaired": "Guardian conectat cu succes!"
   },
+  "notifications": {
+    "channelName": "Alerte Înșelătorii",
+    "channelDescription": "Alerte când un contact protejat este pe un apel suspect",
+    "alertCreated": {
+      "title": "⚠ Apel Suspect",
+      "body": "{{name}} ar putea fi pe un apel de înșelătorie",
+      "bodyGeneric": "Un contact ar putea fi pe un apel de înșelătorie"
+    },
+    "alertRetry": {
+      "title": "⚠ Încă Activ",
+      "body": "{{name}} ar putea fi în continuare pe un apel suspect",
+      "bodyGeneric": "Un contact ar putea fi în continuare pe un apel suspect"
+    },
+    "riskEscalated": {
+      "title": "🚨 Risc Crescut",
+      "body": "Nivelul de risc al apelului lui {{name}} a crescut",
+      "bodyGeneric": "Nivelul de risc al apelului a crescut"
+    }
+  },
   "smsBanner": {
     "title": "ALERTĂ FRAUDĂ",
     "body": "Ai primit un cod OTP în timp ce vorbeai cu un număr necunoscut. NU îl comunica nimănui.",

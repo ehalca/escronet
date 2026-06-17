@@ -77,6 +77,9 @@ export class AlertsService implements OnModuleDestroy {
     }
 
     const guardianIds = relations.map((r) => r.guardianUserId);
+    const labelByGuardian = new Map<string, string>(
+      relations.map((r) => [r.guardianUserId, r.guardianLabel ?? ""]),
+    );
     const guardians = await this.userRepo.findBy({ id: In(guardianIds) });
     this.logger.log(
       `[createAlert] loaded ${guardians.length} guardian(s): ` +
@@ -86,7 +89,7 @@ export class AlertsService implements OnModuleDestroy {
     );
 
     let dispatched = 0;
-    const retryEntries: Array<{ notificationId: string; guardianId: string }> = [];
+    const retryEntries: Array<{ notificationId: string; guardianId: string; guardianLabel: string }> = [];
 
     await Promise.all(
       guardians.map(async (guardian) => {
@@ -103,15 +106,19 @@ export class AlertsService implements OnModuleDestroy {
 
         if (!guardian.fcmToken) {
           this.logger.warn(`[createAlert] guardian=${guardian.id} has no fcmToken — skipping push`);
-          retryEntries.push({ notificationId: notification.id, guardianId: guardian.id });
+          retryEntries.push({ notificationId: notification.id, guardianId: guardian.id, guardianLabel: labelByGuardian.get(guardian.id) ?? "" });
           return;
         }
 
         try {
           await this.messaging.sendToDevice(guardian.fcmToken, {
-            title: "Alert: Possible scam call",
-            body: "Your contact may be on a scam call",
-            data: { alertId: alert.id, notificationId: notification.id, riskLevel: String(alert.riskLevel) },
+            data: {
+              type: "alert_created",
+              alertId: alert.id,
+              notificationId: notification.id,
+              riskLevel: String(alert.riskLevel),
+              protectedUserLabel: labelByGuardian.get(guardian.id) ?? "",
+            },
           });
           notification.delivered = true;
           notification.deliveredAt = new Date();
@@ -122,7 +129,7 @@ export class AlertsService implements OnModuleDestroy {
           this.logger.warn(`[createAlert] FCM failed for guardian=${guardian.id}: ${String(err)}`);
         }
 
-        retryEntries.push({ notificationId: notification.id, guardianId: guardian.id });
+        retryEntries.push({ notificationId: notification.id, guardianId: guardian.id, guardianLabel: labelByGuardian.get(guardian.id) ?? "" });
       }),
     );
 
@@ -138,12 +145,12 @@ export class AlertsService implements OnModuleDestroy {
 
   private startRetryLoop(
     alertId: string,
-    entries: Array<{ notificationId: string; guardianId: string }>,
+    entries: Array<{ notificationId: string; guardianId: string; guardianLabel: string }>,
   ): void {
     const ids = new Set(entries.map((e) => e.notificationId));
     this.alertRetryIndex.set(alertId, ids);
-    for (const { notificationId, guardianId } of entries) {
-      this.scheduleRetry(alertId, notificationId, guardianId, INITIAL_RETRY_MS);
+    for (const { notificationId, guardianId, guardianLabel } of entries) {
+      this.scheduleRetry(alertId, notificationId, guardianId, guardianLabel, INITIAL_RETRY_MS);
     }
     this.logger.log(`[retry] loop started alertId=${alertId} guardians=${entries.length} initialInterval=${INITIAL_RETRY_MS}ms`);
   }
@@ -152,10 +159,11 @@ export class AlertsService implements OnModuleDestroy {
     alertId: string,
     notificationId: string,
     guardianId: string,
+    guardianLabel: string,
     intervalMs: number,
   ): void {
     const timer = setTimeout(() => {
-      void this.executeRetry(alertId, notificationId, guardianId, intervalMs);
+      void this.executeRetry(alertId, notificationId, guardianId, guardianLabel, intervalMs);
     }, intervalMs);
     this.retryTimers.set(notificationId, timer);
   }
@@ -164,6 +172,7 @@ export class AlertsService implements OnModuleDestroy {
     alertId: string,
     notificationId: string,
     guardianId: string,
+    guardianLabel: string,
     currentInterval: number,
   ): Promise<void> {
     this.retryTimers.delete(notificationId);
@@ -186,9 +195,13 @@ export class AlertsService implements OnModuleDestroy {
     if (guardian?.fcmToken) {
       try {
         await this.messaging.sendToDevice(guardian.fcmToken, {
-          title: "Alert: Possible scam call",
-          body: "Your contact may still be on a scam call — please check",
-          data: { alertId, notificationId, riskLevel: String(alert.riskLevel) },
+          data: {
+            type: "alert_retry",
+            alertId,
+            notificationId,
+            riskLevel: String(alert.riskLevel),
+            protectedUserLabel: guardianLabel,
+          },
         });
         this.logger.log(`[retry] push sent to guardian=${guardianId} interval=${currentInterval}ms`);
       } catch (err) {
@@ -197,7 +210,7 @@ export class AlertsService implements OnModuleDestroy {
     }
 
     const nextInterval = Math.max(MIN_RETRY_MS, Math.round(currentInterval * RETRY_DECAY));
-    this.scheduleRetry(alertId, notificationId, guardianId, nextInterval);
+    this.scheduleRetry(alertId, notificationId, guardianId, guardianLabel, nextInterval);
     this.logger.log(`[retry] next retry for notif=${notificationId} in ${nextInterval}ms`);
   }
 
@@ -243,14 +256,20 @@ export class AlertsService implements OnModuleDestroy {
     const guardianIds = notifications.map((n) => n.guardianUserId);
     const guardians = await this.userRepo.findBy({ id: In(guardianIds) });
 
+    const relations = await this.relationRepo.find({ where: { userId, guardianUserId: In(guardianIds) } });
+    const labelByGuardian = new Map<string, string>(relations.map((r) => [r.guardianUserId, r.guardianLabel ?? ""]));
+
     await Promise.all(
       guardians.map(async (guardian) => {
         if (!guardian.fcmToken) return;
         try {
           await this.messaging.sendToDevice(guardian.fcmToken, {
-            title: "⚠ Risk escalated",
-            body: "The scam risk for an active call just increased",
-            data: { alertId, riskLevel },
+            data: {
+              type: "risk_escalated",
+              alertId,
+              riskLevel,
+              protectedUserLabel: labelByGuardian.get(guardian.id) ?? "",
+            },
           });
         } catch (err) {
           this.logger.warn(`[updateAlertRisk] FCM failed for guardian=${guardian.id}: ${String(err)}`);

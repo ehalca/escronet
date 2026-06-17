@@ -1,3 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Escronet</string>
+
+    <!-- Notification channels -->
+    <string name="notification_channel_monitoring_name">Call Monitoring</string>
+    <string name="notification_channel_alerts_name">Call Alerts</string>
+
+    <!-- Foreground monitoring notification -->
+    <string name="notification_monitoring_idle_title">Escronet</string>
+    <string name="notification_monitoring_idle_body">Monitoring calls for scam activity</string>
+    <string name="notification_monitoring_active_title">Call in progress</string>
+    <string name="notification_incoming_call">Incoming call: %1$s</string>
+    <string name="notification_unknown_number">Unknown</string>
+
+    <!-- Alert notification (unknown caller detected) -->
+    <string name="notification_alert_title">Suspicious call</string>
+    <string name="notification_alert_body">%1$s is not in your contacts — stay alert</string>
+
+    <!-- OTP system overlay -->
+    <string name="notification_otp_warning">SCAM ALERT</string>
+    <string name="notification_otp_body">You received a one-time code during a call with an unknown number. Do NOT share it.</string>
 </resources>
