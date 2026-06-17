@@ -237,6 +237,26 @@
         "p1privacy": "Notificările conțin doar un nivel de risc și un marcaj de timp — fără audio, fără transcript."
       }
     },
+    "deleteAccount": {
+      "title": "Șterge Contul Tău",
+      "subtitle": "Aceasta va elimina permanent toate datele, alertele și legăturile de gardian din Escronet. Această acțiune nu poate fi anulată.",
+      "userIdLabel": "ID-ul tău de utilizator",
+      "userIdPlaceholder": "Lipește ID-ul din aplicație",
+      "userIdHint": "Găsește ID-ul în aplicație la Setări → ID Dispozitiv.",
+      "confirmLabel": "Înțeleg că această acțiune este permanentă și nu poate fi anulată.",
+      "submit": "Șterge Contul Meu",
+      "submitting": "Se șterge…",
+      "errorRequired": "Te rugăm să introduci ID-ul de utilizator.",
+      "errorFormat": "ID-ul trebuie să fie un UUID valid.",
+      "errorConfirm": "Trebuie să confirmi înainte de a continua.",
+      "errorNotFound": "Nu a fost găsit niciun cont cu acel ID.",
+      "errorGeneric": "Ceva a mers greșit. Încearcă din nou."
+    },
+    "deleteAccountSuccess": {
+      "title": "Cont Șters",
+      "body": "Contul tău și toate datele asociate au fost eliminate permanent din Escronet.",
+      "back": "Înapoi la Pagina Principală"
+    },
     "privacyPage": {
       "title": "Politică de Confidențialitate",
       "updated": "Ultima actualizare: iunie 2026",

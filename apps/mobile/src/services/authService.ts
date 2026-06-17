@@ -131,3 +131,16 @@ export function listenForTokenRefresh(): () => void {
     api.auth.register({ registrationJwt, fcmToken }).catch(() => null);
   });
 }
+
+// Fires `onDeleted` when Firebase transitions from signed-in → signed-out,
+// which happens when the server deletes the Firebase auth user.
+export function listenForAccountDeletion(onDeleted: () => void): () => void {
+  let hasBeenSignedIn = false;
+  return onAuthStateChanged(getAuth(), (user) => {
+    if (user) {
+      hasBeenSignedIn = true;
+    } else if (hasBeenSignedIn) {
+      onDeleted();
+    }
+  });
+}

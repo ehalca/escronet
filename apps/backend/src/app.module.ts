@@ -17,6 +17,7 @@ import { FirebaseModule } from "./modules/firebase/firebase.module";
 import { GuardianEventsModule } from "./gateway/guardian-events.module";
 import { GuardianLinksModule } from "./modules/guardian-links/guardian-links.module";
 import { GuardiansModule } from "./modules/guardians/guardians.module";
+import { AccountModule } from "./modules/account/account.module";
 import { StatsModule } from "./modules/stats/stats.module";
 import { FirebaseAuthGuard } from "./common/auth.guard";
 import { HealthController } from "./controllers/health.controller";
@@ -27,16 +28,19 @@ import { HealthController } from "./controllers/health.controller";
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: "postgres",
-        host: config.get<string>("DB_HOST", "localhost"),
-        port: Number(config.get<string>("DB_PORT", "5432")),
-        username: config.get<string>("DB_USER", "escronet"),
-        password: config.get<string>("DB_PASSWORD", "escronet"),
-        database: config.get<string>("DB_NAME", "escronet"),
-        synchronize: true,
-        entities: [Alert, AlertNotification, Caller, GuardianLink, GuardianRelation, User],
-      }),
+      useFactory: (config: ConfigService) => {
+        const isProd = config.get<string>("RUNNING_MODE", "dev") === "prod";
+        return {
+          type: "postgres",
+          host: config.get<string>("DB_HOST", "localhost"),
+          port: Number(config.get<string>("DB_PORT", "5432")),
+          username: config.get<string>("DB_USER", "escronet"),
+          password: config.get<string>("DB_PASSWORD", "escronet"),
+          database: config.get<string>("DB_NAME", "escronet"),
+          synchronize: !isProd,
+          entities: [Alert, AlertNotification, Caller, GuardianLink, GuardianRelation, User],
+        };
+      },
     }),
     TerminusModule,
     AlertsModule,
@@ -46,6 +50,7 @@ import { HealthController } from "./controllers/health.controller";
     GuardianEventsModule,
     GuardianLinksModule,
     GuardiansModule,
+    AccountModule,
     StatsModule,
   ],
   controllers: [HealthController],

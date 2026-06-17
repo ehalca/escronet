@@ -237,6 +237,26 @@
         "p1privacy": "Notifications contain only a risk level and timestamp — no audio, no transcript."
       }
     },
+    "deleteAccount": {
+      "title": "Delete Your Account",
+      "subtitle": "This will permanently remove all your data, alerts, and guardian links from Escronet. This action cannot be undone.",
+      "userIdLabel": "Your User ID",
+      "userIdPlaceholder": "Paste your User ID from the app",
+      "userIdHint": "Find your User ID in the app under Settings → Device ID.",
+      "confirmLabel": "I understand this is permanent and cannot be undone.",
+      "submit": "Delete My Account",
+      "submitting": "Deleting…",
+      "errorRequired": "Please enter your User ID.",
+      "errorFormat": "User ID must be a valid UUID.",
+      "errorConfirm": "You must confirm before proceeding.",
+      "errorNotFound": "No account found with that User ID.",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "deleteAccountSuccess": {
+      "title": "Account Deleted",
+      "body": "Your account and all associated data have been permanently removed from Escronet.",
+      "back": "Back to Home"
+    },
     "privacyPage": {
       "title": "Privacy Policy",
       "updated": "Last updated: June 2026",

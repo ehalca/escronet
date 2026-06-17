@@ -215,12 +215,32 @@ class CallDetectionForegroundService : Service() {
     }
 
     private fun isOtpMessage(body: String): Boolean {
-        if (body.length > 300) return false
-        val hasCode = Regex("""\b\d{4,8}\b""").containsMatchIn(body)
-        val hasKeyword = Regex(
-            """(?i)\b(code|cod|otp|pin|verif|verificare|parola|код|пин|пароль|ключ)\b"""
-        ).containsMatchIn(body)
-        return hasCode && hasKeyword
+        if (body.length > 500) return false
+
+        // 4–8 consecutive digits, or two 3-digit groups split by space/dash (e.g. "123 456", "123-456")
+        val hasCode = Regex("""\b\d{4,8}\b|\b\d{3}[\s\-]\d{3}\b""").containsMatchIn(body)
+        if (!hasCode) return false
+
+        // Latin / Romanian keywords — word-boundary anchored
+        val latinKeywords = Regex(
+            """(?i)\b(""" +
+            // generic OTP terms
+            """otp|opt|one.?time|passcode|passkey|passwd|password|secret|""" +
+            // action words
+            """verif\w*|auth\w*|confirm\w*|activat\w*|""" +
+            // descriptor words
+            """security|access|token|temp\w*|code|pin|""" +
+            // Romanian
+            """cod\w*|parola|verificare|acces|temporar|cheie|secret""" +
+            """)\b"""
+        )
+
+        // Cyrillic keywords — no \b (ASCII word boundary doesn't apply to Cyrillic)
+        val cyrillicKeywords = Regex(
+            """(?i)(код|пин|пароль|ключ|пароль|секрет|одноразов\w*|подтвержд\w*|активац\w*|доступ|токен)"""
+        )
+
+        return latinKeywords.containsMatchIn(body) || cyrillicKeywords.containsMatchIn(body)
     }
 
     // ── System overlay (shown over any foreground app) ──────────────────────────

@@ -167,5 +167,6 @@ apps/mobile/fastlane/Escronet_App_Store.mobileprovision
 apps/mobile/build/
 apps/mobile/Gemfile.lock
 
-# Generated Play Store assets (not committed — copy manually)
+# Generated Play Store assets (not committed ï¿½ copy manually)
 tools/store-assets/
+my-release.jks

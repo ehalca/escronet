@@ -1,0 +1,197 @@
+name: Android Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - '.github/workflows/android-release.yml'
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play Store track'
+        type: choice
+        options: [internal, alpha, beta, production]
+        default: internal
+      rollout:
+        description: 'Staged rollout fraction for production (0.01 – 1.0)'
+        default: '0.1'
+      force:
+        description: 'Release even if source hash is unchanged'
+        type: boolean
+        default: false
+
+# Never cancel a release mid-flight; queue the next one instead.
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build & Upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create GitHub releases + tags
+
+    steps:
+      # ── 1. Source ────────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for git log changelog
+
+      # ── 2. Fingerprint source BEFORE any build work ──────────────────────────
+      - name: Compute source fingerprint
+        id: fp
+        run: |
+          HASH=$(find apps/mobile/src \
+                      apps/mobile/android/app/src/main/java \
+                      packages/shared/src \
+                      packages/i18n/src \
+                 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.kt" -o -name "*.java" -o -name "*.json" \) \
+                 2>/dev/null \
+                 | sort | xargs sha256sum | sha256sum | awk '{print $1}')
+          echo "value=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Restore previous fingerprint
+        uses: actions/cache/restore@v4
+        with:
+          path: .release-fingerprint
+          key: android-fingerprint-${{ github.ref_name }}
+
+      - name: Gate — should we release?
+        id: gate
+        run: |
+          PREV=""; [ -f .release-fingerprint ] && PREV=$(cat .release-fingerprint)
+          FORCE="${{ inputs.force || 'false' }}"
+          if [ "$PREV" != "${{ steps.fp.outputs.value }}" ] || [ "$FORCE" = "true" ]; then
+            echo "yes=true" >> $GITHUB_OUTPUT
+          else
+            echo "yes=false" >> $GITHUB_OUTPUT
+            echo "Source fingerprint unchanged since last release — skipping."
+          fi
+
+      # ── 3. Toolchain (only when gate passes) ─────────────────────────────────
+      - uses: actions/setup-java@v4
+        if: steps.gate.outputs.yes == 'true'
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: gradle
+
+      - uses: pnpm/action-setup@v4
+        if: steps.gate.outputs.yes == 'true'
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.yes == 'true'
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.gate.outputs.yes == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared types
+        if: steps.gate.outputs.yes == 'true'
+        run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          cd packages/shared && tsc
+
+      # ── 4. Keystore ──────────────────────────────────────────────────────────
+      - name: Decode keystore
+        if: steps.gate.outputs.yes == 'true'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d \
+            > apps/mobile/android/app/release.jks
+
+      # ── 5. Version numbers ───────────────────────────────────────────────────
+      - name: Resolve version
+        if: steps.gate.outputs.yes == 'true'
+        id: ver
+        run: |
+          echo "code=${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "name=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      # ── 6. Build release AAB ─────────────────────────────────────────────────
+      # The React Native Gradle plugin (com.facebook.react) bundles JS automatically.
+      - name: Build release AAB
+        if: steps.gate.outputs.yes == 'true'
+        working-directory: apps/mobile/android
+        run: ./gradlew bundleRelease --no-daemon
+        env:
+          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=512m"
+          # Version injection (ORG_GRADLE_PROJECT_* → project properties)
+          ORG_GRADLE_PROJECT_versionCode: ${{ steps.ver.outputs.code }}
+          ORG_GRADLE_PROJECT_versionName: ${{ steps.ver.outputs.name }}
+          # Signing (read by signingConfigs.release in build.gradle)
+          ORG_GRADLE_PROJECT_ANDROID_KEYSTORE_FILE: release.jks
+          ORG_GRADLE_PROJECT_ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      # ── 7. Changelog from git history ────────────────────────────────────────
+      - name: Generate changelog
+        if: steps.gate.outputs.yes == 'true'
+        run: |
+          mkdir -p distribution/whatsnew
+          # Play Store limit: 500 chars per locale
+          git log --pretty=format:"• %s" --no-merges -20 \
+            | head -c 490 \
+            | tee distribution/whatsnew/whatsnew-en-US \
+                  distribution/whatsnew/whatsnew-ro-RO \
+                  distribution/whatsnew/whatsnew-ru-RU > /dev/null
+
+      # ── 8. Upload to Play Store ──────────────────────────────────────────────
+      - name: Upload to Play Store
+        if: steps.gate.outputs.yes == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.escronet
+          releaseFiles: apps/mobile/android/app/build/outputs/bundle/release/*.aab
+          track: ${{ inputs.track || 'internal' }}
+          status: completed
+          # userFraction only meaningful on production staged rollout
+          userFraction: ${{ (inputs.track == 'production') && inputs.rollout || '1.0' }}
+          whatsNewDirectory: distribution/whatsnew
+          releaseName: "v${{ steps.ver.outputs.name }} (build ${{ steps.ver.outputs.code }})"
+          inAppUpdatePriority: 2
+
+      # ── 9. GitHub release + artifact ─────────────────────────────────────────
+      - name: Create GitHub release
+        if: steps.gate.outputs.yes == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.code }}"
+          name: "v${{ steps.ver.outputs.name }} (build ${{ steps.ver.outputs.code }})"
+          body_path: distribution/whatsnew/whatsnew-en-US
+          files: apps/mobile/android/app/build/outputs/bundle/release/*.aab
+          prerelease: ${{ (inputs.track || 'internal') != 'production' }}
+
+      - name: Archive AAB
+        if: steps.gate.outputs.yes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: escronet-aab-${{ steps.ver.outputs.code }}
+          path: apps/mobile/android/app/build/outputs/bundle/release/*.aab
+          retention-days: 90
+
+      # ── 10. Persist fingerprint for next run ─────────────────────────────────
+      - name: Save fingerprint
+        if: steps.gate.outputs.yes == 'true'
+        run: echo "${{ steps.fp.outputs.value }}" > .release-fingerprint
+
+      - name: Cache fingerprint
+        if: steps.gate.outputs.yes == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .release-fingerprint
+          key: android-fingerprint-${{ github.ref_name }}
+
+      # ── Cleanup — always runs even on failure ────────────────────────────────
+      - name: Wipe keystore
+        if: always()
+        run: rm -f apps/mobile/android/app/release.jks

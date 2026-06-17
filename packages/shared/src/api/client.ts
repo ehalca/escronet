@@ -141,6 +141,10 @@ export function createApiClient(
       remove: (id: string, opts?: Pick<CallOpts, "version">) =>
         call(baseUrl, "DELETE", `/guardians/${id}`, z.void(), t, opts),
     },
+    account: {
+      me: (opts?: Pick<CallOpts, "version">) =>
+        call(baseUrl, "GET", "/account/me", z.object({ ok: z.boolean() }), t, opts),
+    },
     stats: {
       public: (opts?: Pick<CallOpts, "version">) =>
         call(baseUrl, "GET", "/stats/public", PublicStatsSchema, null, opts),
