@@ -22,12 +22,14 @@
     "dev": "docker compose -f local-docker-compose.yml up -d && concurrently -n shared,backend,frontend -c cyan,blue,green \"pnpm dev:shared\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "dev:shared": "pnpm --filter @escronet/shared dev:types",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "generate:assets": "node tools/generate-assets.mjs"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.1.4",
     "concurrently": "^10.0.3",
+    "sharp": "^0.35.1",
     "typescript": "^6.0.3"
   }
 }

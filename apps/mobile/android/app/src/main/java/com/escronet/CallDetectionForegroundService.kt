@@ -150,7 +150,7 @@ class CallDetectionForegroundService : Service() {
         nm.notify(
             ALERT_NOTIF_ID,
             NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Unknown caller")
                 .setContentText("$phoneNumber is not in your contacts")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -389,7 +389,7 @@ class CallDetectionForegroundService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, MONITOR_CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_call)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(if (callText != null) "Call in progress" else "Escronet")
             .setContentText(callText ?: "Monitoring for unknown callers")
             .setPriority(NotificationCompat.PRIORITY_MIN)

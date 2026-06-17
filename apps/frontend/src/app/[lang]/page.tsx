@@ -5,6 +5,7 @@ import { NavBar } from "@/components/landing/NavBar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { InstallSection } from "@/components/landing/InstallSection";
 import { StatsSection } from "@/components/landing/StatsSection";
 import { PhoneCheckSection } from "@/components/landing/PhoneCheckSection";
 import { FaqSection } from "@/components/landing/FaqSection";
@@ -24,6 +25,7 @@ export default function LandingPage({
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
+        <InstallSection />
         <StatsSection />
         <PhoneCheckSection />
         <FaqSection />

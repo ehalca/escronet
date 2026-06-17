@@ -5,32 +5,17 @@ import { SUPPORTED_LANGUAGES } from "@escronet/i18n";
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
-  // Skip non-page assets
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.includes(".")
-  ) {
-    return NextResponse.next();
-  }
-
-  // Already has a supported lang prefix
+  // Already has any supported lang prefix — pass through unchanged
   const firstSegment = pathname.split("/")[1];
   if ((SUPPORTED_LANGUAGES as readonly string[]).includes(firstSegment)) {
     return NextResponse.next();
   }
 
-  // Detect preferred language from Accept-Language header
-  const acceptLang = request.headers.get("accept-language") ?? "";
-  const preferred = acceptLang
-    .split(",")
-    .map((s) => s.split(";")[0].trim().split("-")[0].toLowerCase())
-    .find((code) => (SUPPORTED_LANGUAGES as readonly string[]).includes(code));
-
-  const lang = preferred ?? "en";
+  // No lang prefix: rewrite to /en/... without changing the browser URL.
+  // English is the default language served at bare paths (/, /privacy, etc.).
   const url = request.nextUrl.clone();
-  url.pathname = `/${lang}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.redirect(url);
+  url.pathname = `/en${pathname === "/" ? "" : pathname}`;
+  return NextResponse.rewrite(url);
 }
 
 export const config = {

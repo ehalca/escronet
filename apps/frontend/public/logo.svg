@@ -1,0 +1,12 @@
+<svg width="180" height="40" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield icon -->
+  <g transform="translate(0, 2)">
+    <path d="M18 2 L34 8 L34 18 C34 27 27 33 18 37 C9 33 2 27 2 18 L2 8 Z"
+          fill="#1E3A5F" stroke="#4FC3F7" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="11" y="17" width="4" height="8" rx="2" fill="#4FC3F7"/>
+    <rect x="17" y="14" width="4" height="14" rx="2" fill="#4FC3F7"/>
+    <rect x="23" y="11" width="4" height="20" rx="2" fill="#4FC3F7"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="44" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="white" letter-spacing="-0.5">Escronet</text>
+</svg>
