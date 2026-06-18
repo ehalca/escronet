@@ -36,6 +36,22 @@
     "category": "Categorie",
     "callerLabel": "Apelant"
   },
+  "report": {
+    "title": "Raportează acest apel",
+    "submit": "Trimite raportul",
+    "submitted": "Raportat",
+    "scamTypes": {
+      "delivery": "Livrare",
+      "police_ticket": "Amendă / Poliție",
+      "credit": "Credit",
+      "stolen_identity": "Furt de identitate",
+      "tech_support": "Suport tehnic",
+      "investment": "Investiții / Crypto",
+      "romance_lottery": "Romantism / Loterie",
+      "bank_impersonation": "Impersonare bancă",
+      "others": "Altele"
+    }
+  },
   "settings": {
     "title": "Setări",
     "sectionProtection": "Protecție",

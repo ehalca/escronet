@@ -1,4 +1,5 @@
 export { RiskLevel } from "./enums/risk-level.enum";
+export { ScamType } from "./enums/scam-type.enum";
 export {
   RegisterDeviceInputSchema,
   AuthResponseSchema,
@@ -93,6 +94,18 @@ export type {
 
 export { PublicStatsSchema, CallerCheckInputSchema, CallerCheckResultSchema } from "./schemas/stats.schema";
 export type { PublicStats, CallerCheckInput, CallerCheckResult } from "./schemas/stats.schema";
+
+export {
+  CreateReportInputSchema,
+  ReportRecordSchema,
+  CreateReportResponseSchema,
+} from "./schemas/report.schema";
+export type {
+  CreateReportInput,
+  ReportRecord,
+  CreateReportResponse,
+} from "./schemas/report.schema";
+export type { IReport } from "./interfaces/report.interface";
 
 export { createApiClient } from "./api/client";
 export type { ApiClient } from "./api/client";

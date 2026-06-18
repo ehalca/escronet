@@ -5,6 +5,7 @@ import { Alert } from "../../entities/alert.entity";
 import { AlertNotification } from "../../entities/alert-notification.entity";
 import { GuardianRelation } from "../../entities/guardian-relation.entity";
 import { User } from "../../entities/user.entity";
+import { Report } from "../../entities/report.entity";
 import { GuardianEventsGateway } from "../../gateway/guardian-events.gateway";
 import { FirebaseMessagingService } from "../firebase/firebase-messaging.service";
 import type {
@@ -38,6 +39,8 @@ export class AlertsService implements OnModuleDestroy {
     private readonly relationRepo: Repository<GuardianRelation>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(Report)
+    private readonly reportRepo: Repository<Report>,
     private readonly messaging: FirebaseMessagingService,
     private readonly gateway: GuardianEventsGateway,
   ) {}
@@ -305,7 +308,24 @@ export class AlertsService implements OnModuleDestroy {
 
   async listMyAlerts(userId: string): Promise<ListMyAlertsResponse> {
     const alerts = await this.alertRepo.find({ where: { userId }, order: { detectedAt: "DESC" } });
-    return { alerts: alerts.map((a) => this.toAlertRecord(a)) };
+    if (alerts.length === 0) return { alerts: [] };
+
+    const alertIds = alerts.map((a) => a.id);
+    const myReports = await this.reportRepo.find({
+      where: { alertId: In(alertIds), reporterId: userId },
+      select: ["id", "alertId", "type"],
+    });
+    const reportByAlertId = new Map(myReports.map((r) => [r.alertId, r]));
+
+    return {
+      alerts: alerts.map((a) => {
+        const report = reportByAlertId.get(a.id) ?? null;
+        return {
+          ...this.toAlertRecord(a),
+          myReport: report ? { id: report.id, type: report.type } : null,
+        };
+      }),
+    };
   }
 
   async listGuardianNotifications(guardianUserId: string): Promise<ListAlertNotificationsResponse> {
@@ -325,32 +345,43 @@ export class AlertsService implements OnModuleDestroy {
       relations.map((r) => [r.userId, r.guardianLabel]),
     );
 
+    const alertIds = notifications.map((n) => n.alertId);
+    const myReports = await this.reportRepo.find({
+      where: { alertId: In(alertIds), reporterId: guardianUserId },
+      select: ["id", "alertId", "type"],
+    });
+    const reportByAlertId = new Map(myReports.map((r) => [r.alertId, r]));
+
     return {
-      notifications: notifications.map((n) => ({
-        id: n.id,
-        alertId: n.alertId,
-        guardianUserId: n.guardianUserId,
-        delivered: n.delivered,
-        deliveredAt: n.deliveredAt?.toISOString() ?? null,
-        seen: n.seen,
-        seenAt: n.seenAt?.toISOString() ?? null,
-        createdAt: n.createdAt.toISOString(),
-        updatedAt: n.updatedAt.toISOString(),
-        alert: {
-          riskLevel: n.alert.riskLevel,
-          callerHash: n.alert.callerHash,
-          callDuration: n.alert.callDuration,
-          callStartedAt: n.alert.callStartedAt?.toISOString() ?? null,
-          detectedAt: n.alert.detectedAt.toISOString(),
-          transcriptSnippet: n.alert.transcriptSnippet,
-          category: n.alert.category,
-          score: n.alert.score,
-          status: (n.alert.status ?? "active") as "active" | "hung",
-          hungAt: n.alert.hungAt?.toISOString() ?? null,
-        },
-        protectedUserId: n.alert.userId,
-        protectedUserLabel: labelMap.get(n.alert.userId) ?? null,
-      })),
+      notifications: notifications.map((n) => {
+        const report = reportByAlertId.get(n.alertId) ?? null;
+        return {
+          id: n.id,
+          alertId: n.alertId,
+          guardianUserId: n.guardianUserId,
+          delivered: n.delivered,
+          deliveredAt: n.deliveredAt?.toISOString() ?? null,
+          seen: n.seen,
+          seenAt: n.seenAt?.toISOString() ?? null,
+          createdAt: n.createdAt.toISOString(),
+          updatedAt: n.updatedAt.toISOString(),
+          alert: {
+            riskLevel: n.alert.riskLevel,
+            callerHash: n.alert.callerHash,
+            callDuration: n.alert.callDuration,
+            callStartedAt: n.alert.callStartedAt?.toISOString() ?? null,
+            detectedAt: n.alert.detectedAt.toISOString(),
+            transcriptSnippet: n.alert.transcriptSnippet,
+            category: n.alert.category,
+            score: n.alert.score,
+            status: (n.alert.status ?? "active") as "active" | "hung",
+            hungAt: n.alert.hungAt?.toISOString() ?? null,
+          },
+          protectedUserId: n.alert.userId,
+          protectedUserLabel: labelMap.get(n.alert.userId) ?? null,
+          myReport: report ? { id: report.id, type: report.type } : null,
+        };
+      }),
     };
   }
 
@@ -383,6 +414,7 @@ export class AlertsService implements OnModuleDestroy {
       updatedAt: a.updatedAt.toISOString(),
       status: (a.status ?? "active") as "active" | "hung",
       hungAt: a.hungAt?.toISOString() ?? null,
+      myReport: null,
     };
   }
 }

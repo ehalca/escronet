@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { RiskLevel } from "../enums/risk-level.enum";
+import { ScamType } from "../enums/scam-type.enum";
 
 export const AlertStatusSchema = z.enum(["active", "hung"]);
 export type AlertStatus = z.infer<typeof AlertStatusSchema>;
@@ -40,6 +41,9 @@ export const AlertRecordSchema = z.object({
   updatedAt: z.string().datetime(),
   status: AlertStatusSchema,
   hungAt: z.string().datetime().nullable(),
+  myReport: z
+    .object({ id: z.string().uuid(), type: z.nativeEnum(ScamType) })
+    .nullable(),
 });
 
 export const AlertInNotificationSchema = z.object({
@@ -71,6 +75,9 @@ export const AlertNotificationRecordSchema = z.object({
   protectedUserId: z.string().uuid(),
   /** Label the guardian gave to this protected user (from GuardianRelation.guardianLabel) */
   protectedUserLabel: z.string().nullable(),
+  myReport: z
+    .object({ id: z.string().uuid(), type: z.nativeEnum(ScamType) })
+    .nullable(),
 });
 
 export const CreateAlertResponseSchema = z.object({

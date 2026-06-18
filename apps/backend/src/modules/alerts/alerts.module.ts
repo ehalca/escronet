@@ -4,13 +4,14 @@ import { Alert } from "../../entities/alert.entity";
 import { AlertNotification } from "../../entities/alert-notification.entity";
 import { GuardianRelation } from "../../entities/guardian-relation.entity";
 import { User } from "../../entities/user.entity";
+import { Report } from "../../entities/report.entity";
 import { GuardianEventsModule } from "../../gateway/guardian-events.module";
 import { AlertsService } from "./alerts.service";
 import { AlertsController } from "./alerts.controller";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Alert, AlertNotification, GuardianRelation, User]),
+    TypeOrmModule.forFeature([Alert, AlertNotification, GuardianRelation, User, Report]),
     GuardianEventsModule,
   ],
   controllers: [AlertsController],

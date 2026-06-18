@@ -36,6 +36,22 @@
     "category": "Категория",
     "callerLabel": "Звонящий"
   },
+  "report": {
+    "title": "Отметить этот звонок",
+    "submit": "Отметить",
+    "submitted": "Отмечено",
+    "scamTypes": {
+      "delivery": "Доставка",
+      "police_ticket": "Штраф / Полиция",
+      "credit": "Кредит",
+      "stolen_identity": "Кража личности",
+      "tech_support": "Техподдержка",
+      "investment": "Инвестиции / Крипто",
+      "romance_lottery": "Романтика / Лотерея",
+      "bank_impersonation": "Подделка банка",
+      "others": "Другое"
+    }
+  },
   "settings": {
     "title": "Настройки",
     "sectionProtection": "Защита",

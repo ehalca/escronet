@@ -21,6 +21,8 @@ import {
   ListGuardiansResponseSchema,
   ListGuardedUsersResponseSchema,
 } from "../schemas/guardian.schema";
+import { CreateReportResponseSchema } from "../schemas/report.schema";
+import type { CreateReportInput } from "../schemas/report.schema";
 
 const PingResponseSchema = z.object({
   message: z.string(),
@@ -164,6 +166,10 @@ export function createApiClient(
         call(baseUrl, "PATCH", `/alerts/${id}/status`, z.void(), t, { ...opts, body }),
       updateRisk: (id: string, body: UpdateAlertRiskInput, opts?: Pick<CallOpts, "version">) =>
         call(baseUrl, "PATCH", `/alerts/${id}/risk`, z.void(), t, { ...opts, body }),
+    },
+    reports: {
+      create: (body: CreateReportInput, opts?: Pick<CallOpts, "version">) =>
+        call(baseUrl, "POST", "/reports", CreateReportResponseSchema, t, { ...opts, body }),
     },
   };
 }

@@ -10,7 +10,8 @@ COPY apps/mobile/package.json   ./apps/mobile/
 COPY packages/shared/package.json    ./packages/shared/
 COPY packages/shared-ui/package.json ./packages/shared-ui/
 COPY packages/i18n/package.json      ./packages/i18n/
-RUN pnpm install --frozen-lockfile
+# Remove Windows-specific virtual-store-dir so pnpm uses its Linux default
+RUN sed -i '/virtual-store-dir/d' .npmrc && pnpm install --frozen-lockfile
 
 # Copy source
 COPY tsconfig.base.json ./

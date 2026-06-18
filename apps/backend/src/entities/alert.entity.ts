@@ -3,6 +3,7 @@ import { RiskLevel } from "@escronet/shared";
 import { BaseEntity } from "./base-entity";
 import { User } from "./user.entity";
 import { AlertNotification } from "./alert-notification.entity";
+import { Report } from "./report.entity";
 
 @Entity("alerts")
 export class Alert extends BaseEntity {
@@ -45,4 +46,7 @@ export class Alert extends BaseEntity {
 
   @OneToMany(() => AlertNotification, (n) => n.alert)
   notifications!: AlertNotification[];
+
+  @OneToMany(() => Report, (r) => r.alert)
+  reports!: Report[];
 }

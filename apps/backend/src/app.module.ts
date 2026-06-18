@@ -9,6 +9,7 @@ import { AlertNotification } from "./entities/alert-notification.entity";
 import { Caller } from "./entities/caller.entity";
 import { GuardianLink } from "./entities/guardian-link.entity";
 import { GuardianRelation } from "./entities/guardian-relation.entity";
+import { Report } from "./entities/report.entity";
 import { User } from "./entities/user.entity";
 import { AlertsModule } from "./modules/alerts/alerts.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -18,6 +19,7 @@ import { GuardianEventsModule } from "./gateway/guardian-events.module";
 import { GuardianLinksModule } from "./modules/guardian-links/guardian-links.module";
 import { GuardiansModule } from "./modules/guardians/guardians.module";
 import { AccountModule } from "./modules/account/account.module";
+import { ReportsModule } from "./modules/reports/reports.module";
 import { StatsModule } from "./modules/stats/stats.module";
 import { FirebaseAuthGuard } from "./common/auth.guard";
 import { HealthController } from "./controllers/health.controller";
@@ -38,7 +40,7 @@ import { HealthController } from "./controllers/health.controller";
           password: config.get<string>("DB_PASSWORD", "escronet"),
           database: config.get<string>("DB_NAME", "escronet"),
           synchronize: !isProd,
-          entities: [Alert, AlertNotification, Caller, GuardianLink, GuardianRelation, User],
+          entities: [Alert, AlertNotification, Caller, GuardianLink, GuardianRelation, Report, User],
         };
       },
     }),
@@ -51,6 +53,7 @@ import { HealthController } from "./controllers/health.controller";
     GuardianLinksModule,
     GuardiansModule,
     AccountModule,
+    ReportsModule,
     StatsModule,
   ],
   controllers: [HealthController],

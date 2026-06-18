@@ -17,7 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import { ALERT_LIST_CHANGED_EVENT } from "../services/callEventService";
-import { RiskLevel } from "@escronet/shared";
+import { RiskLevel, ScamType } from "@escronet/shared";
 import type { AlertRecord, AlertNotificationRecord } from "@escronet/shared";
 
 // ── shared helpers ───────────────────────────────────────────────────────────
@@ -110,6 +110,20 @@ function ActivePulse({ active, children }: { active: boolean; children: React.Re
   return <Animated.View style={{ opacity }}>{children}</Animated.View>;
 }
 
+// ── report type ordered list ──────────────────────────────────────────────────
+
+const SCAM_TYPE_KEYS: ScamType[] = [
+  ScamType.DELIVERY,
+  ScamType.POLICE_TICKET,
+  ScamType.CREDIT,
+  ScamType.STOLEN_IDENTITY,
+  ScamType.TECH_SUPPORT,
+  ScamType.INVESTMENT,
+  ScamType.ROMANCE_LOTTERY,
+  ScamType.BANK_IMPERSONATION,
+  ScamType.OTHERS,
+];
+
 // ── My Alert card ─────────────────────────────────────────────────────────────
 
 function effectiveCallStart(
@@ -124,12 +138,27 @@ function effectiveCallStart(
 
 function MyAlertCard({ item }: { item: AlertRecord }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const active = item.status === "active";
   const riskColor = RISK_COLOR[item.riskLevel] ?? "#546E7A";
   const riskLabel = t(RISK_I18N_KEY[item.riskLevel] ?? "alerts.riskLow");
   const startedAt = effectiveCallStart(item.callStartedAt, item.detectedAt, item.callDuration);
   const liveSecs = useLiveDuration(startedAt, active, item.hungAt);
   const duration = liveSecs != null ? formatDuration(t, liveSecs) : null;
+
+  const [expanded, setExpanded] = useState(false);
+  const [selectedType, setSelectedType] = useState<ScamType | null>(null);
+
+  const reportMutation = useMutation({
+    mutationFn: () => api.reports.create({ alertId: item.id, type: selectedType! }),
+    onSuccess: () => {
+      setExpanded(false);
+      setSelectedType(null);
+      void queryClient.invalidateQueries({ queryKey: ["myAlerts"] });
+    },
+  });
+
+  const submittedType = item.myReport?.type ?? reportMutation.data?.report.type ?? null;
 
   return (
     <ActivePulse active={active}>
@@ -172,6 +201,59 @@ function MyAlertCard({ item }: { item: AlertRecord }) {
               </Text>
             </View>
           )}
+
+          {submittedType !== null ? (
+            <View style={styles.reportedBadge}>
+              <Text style={styles.reportedText}>
+                {t("report.submitted")}: {t(`report.scamTypes.${submittedType}`)}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.reportToggle}
+                onPress={() => setExpanded((v) => !v)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.reportToggleText}>{t("report.title")}</Text>
+                <View style={[styles.chevronIcon, expanded && styles.chevronIconUp]} />
+              </TouchableOpacity>
+
+              {expanded && (
+                <View style={styles.reportForm}>
+                  <View style={styles.chipRow}>
+                    {SCAM_TYPE_KEYS.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        style={[styles.chip, selectedType === type && styles.chipSelected]}
+                        onPress={() => setSelectedType(type)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.chipText, selectedType === type && styles.chipTextSelected]}>
+                          {t(`report.scamTypes.${type}`)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.submitBtn,
+                      (!selectedType || reportMutation.isPending) && styles.submitBtnDisabled,
+                    ]}
+                    onPress={() => { if (selectedType && !reportMutation.isPending) reportMutation.mutate(); }}
+                    disabled={!selectedType || reportMutation.isPending}
+                    activeOpacity={0.8}
+                  >
+                    {reportMutation.isPending ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={styles.submitBtnText}>{t("report.submit")}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          )}
         </View>
       </View>
     </ActivePulse>
@@ -190,6 +272,7 @@ function GuardianCard({
   pending: boolean;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const active = item.alert.status === "active";
   const riskColor = RISK_COLOR[item.alert.riskLevel] ?? "#546E7A";
   const riskLabel = t(RISK_I18N_KEY[item.alert.riskLevel] ?? "alerts.riskLow");
@@ -198,55 +281,123 @@ function GuardianCard({
   const liveSecs = useLiveDuration(startedAt, active, item.alert.hungAt);
   const duration = liveSecs != null ? formatDuration(t, liveSecs) : null;
 
+  const [expanded, setExpanded] = useState(false);
+  const [selectedType, setSelectedType] = useState<ScamType | null>(null);
+
+  const reportMutation = useMutation({
+    mutationFn: () => api.reports.create({ alertId: item.alertId, type: selectedType! }),
+    onSuccess: () => {
+      setExpanded(false);
+      setSelectedType(null);
+      void queryClient.invalidateQueries({ queryKey: ["alertNotifications"] });
+    },
+  });
+
+  const submittedType = item.myReport?.type ?? reportMutation.data?.report.type ?? null;
+
   return (
     <ActivePulse active={active}>
-      <TouchableOpacity
-        style={[styles.card, unseen && styles.cardUnseen, active && styles.cardActive]}
-        activeOpacity={unseen ? 0.7 : 1}
-        onPress={() => { if (unseen && !pending) onMarkSeen(item.id); }}
-      >
+      <View style={[styles.card, unseen && styles.cardUnseen, active && styles.cardActive]}>
         <View style={[styles.riskBar, { backgroundColor: active ? "#FF6F00" : riskColor }]} />
         <View style={styles.cardBody}>
-          <View style={styles.topRow}>
-            <View style={[styles.riskBadge, { backgroundColor: riskColor + "22", borderColor: riskColor }]}>
-              <Text style={[styles.riskBadgeText, { color: riskColor }]}>{riskLabel}</Text>
-            </View>
-            {active && (
-              <View style={[styles.riskBadge, styles.liveBadge]}>
-                <Text style={[styles.riskBadgeText, styles.liveBadgeText]}>● LIVE</Text>
+          <TouchableOpacity
+            activeOpacity={unseen ? 0.7 : 1}
+            onPress={() => { if (unseen && !pending) onMarkSeen(item.id); }}
+          >
+            <View style={styles.topRow}>
+              <View style={[styles.riskBadge, { backgroundColor: riskColor + "22", borderColor: riskColor }]}>
+                <Text style={[styles.riskBadgeText, { color: riskColor }]}>{riskLabel}</Text>
               </View>
-            )}
-            <Text style={styles.timeText}>{timeAgo(item.alert.detectedAt)}</Text>
-            {unseen && <View style={styles.unseenDot} />}
-          </View>
+              {active && (
+                <View style={[styles.riskBadge, styles.liveBadge]}>
+                  <Text style={[styles.riskBadgeText, styles.liveBadgeText]}>● LIVE</Text>
+                </View>
+              )}
+              <Text style={styles.timeText}>{timeAgo(item.alert.detectedAt)}</Text>
+              {unseen && <View style={styles.unseenDot} />}
+            </View>
 
-          <View style={styles.midRow}>
-            <Text style={styles.callerLabel}>{t("alerts.callerLabel")}</Text>
-            <Text style={styles.callerHash}>{shortHash(item.alert.callerHash)}</Text>
-          </View>
+            <View style={styles.midRow}>
+              <Text style={styles.callerLabel}>{t("alerts.callerLabel")}</Text>
+              <Text style={styles.callerHash}>{shortHash(item.alert.callerHash)}</Text>
+            </View>
 
-          {item.alert.category && (
-            <Text style={styles.categoryText}>
-              {t("alerts.category")}: {item.alert.category}
-            </Text>
-          )}
-
-          {item.alert.transcriptSnippet && (
-            <Text style={styles.snippet} numberOfLines={2}>
-              "{item.alert.transcriptSnippet}"
-            </Text>
-          )}
-
-          <View style={styles.bottomRow}>
-            {unseen && <Text style={styles.tapHint}>{t("alerts.tapToMarkSeen")}</Text>}
-            {duration != null && (
-              <Text style={[styles.durationText, active && styles.durationActive]}>
-                {active ? `▶ ${duration}` : duration}
+            {item.alert.category && (
+              <Text style={styles.categoryText}>
+                {t("alerts.category")}: {item.alert.category}
               </Text>
             )}
-          </View>
+
+            {item.alert.transcriptSnippet && (
+              <Text style={styles.snippet} numberOfLines={2}>
+                "{item.alert.transcriptSnippet}"
+              </Text>
+            )}
+
+            <View style={styles.bottomRow}>
+              {unseen && <Text style={styles.tapHint}>{t("alerts.tapToMarkSeen")}</Text>}
+              {duration != null && (
+                <Text style={[styles.durationText, active && styles.durationActive]}>
+                  {active ? `▶ ${duration}` : duration}
+                </Text>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {submittedType !== null ? (
+            <View style={styles.reportedBadge}>
+              <Text style={styles.reportedText}>
+                {t("report.submitted")}: {t(`report.scamTypes.${submittedType}`)}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.reportToggle}
+                onPress={() => setExpanded((v) => !v)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.reportToggleText}>{t("report.title")}</Text>
+                <View style={[styles.chevronIcon, expanded && styles.chevronIconUp]} />
+              </TouchableOpacity>
+
+              {expanded && (
+                <View style={styles.reportForm}>
+                  <View style={styles.chipRow}>
+                    {SCAM_TYPE_KEYS.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        style={[styles.chip, selectedType === type && styles.chipSelected]}
+                        onPress={() => setSelectedType(type)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.chipText, selectedType === type && styles.chipTextSelected]}>
+                          {t(`report.scamTypes.${type}`)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.submitBtn,
+                      (!selectedType || reportMutation.isPending) && styles.submitBtnDisabled,
+                    ]}
+                    onPress={() => { if (selectedType && !reportMutation.isPending) reportMutation.mutate(); }}
+                    disabled={!selectedType || reportMutation.isPending}
+                    activeOpacity={0.8}
+                  >
+                    {reportMutation.isPending ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={styles.submitBtnText}>{t("report.submit")}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          )}
         </View>
-      </TouchableOpacity>
+      </View>
     </ActivePulse>
   );
 }
@@ -489,4 +640,20 @@ const styles = StyleSheet.create({
   categoryText:  { color: "#78909C", fontSize: 11, fontStyle: "italic" },
   snippet:       { color: "#90A4AE", fontSize: 12, lineHeight: 18, fontStyle: "italic" },
   tapHint:       { color: "#4FC3F7", fontSize: 10, opacity: 0.7 },
+
+  reportToggle:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 6, borderTopWidth: 1, borderTopColor: "#1E3A5F" },
+  reportToggleText:  { color: "#4FC3F7", fontSize: 12 },
+  chevronIcon:       { width: 9, height: 9, borderRightWidth: 2, borderBottomWidth: 2, borderColor: "#4FC3F7", transform: [{ rotate: "45deg" }] },
+  chevronIconUp:     { transform: [{ rotate: "-135deg" }] },
+  reportedBadge:     { backgroundColor: "#1B3A2A", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 5, marginTop: 4 },
+  reportedText:      { color: "#4CAF50", fontSize: 11 },
+  reportForm:        { gap: 10, paddingTop: 4 },
+  chipRow:           { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  chip:              { borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: "#1E3A5F", backgroundColor: "#0D1B2A" },
+  chipSelected:      { borderColor: "#4FC3F7", backgroundColor: "#0A2035" },
+  chipText:          { color: "#78909C", fontSize: 11 },
+  chipTextSelected:  { color: "#4FC3F7", fontWeight: "600" },
+  submitBtn:         { backgroundColor: "#4FC3F7", borderRadius: 8, padding: 10, alignItems: "center" },
+  submitBtnDisabled: { backgroundColor: "#1E3A5F", opacity: 0.5 },
+  submitBtnText:     { color: "#0D1B2A", fontWeight: "700", fontSize: 13 },
 });

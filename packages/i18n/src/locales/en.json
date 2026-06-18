@@ -36,6 +36,22 @@
     "category": "Category",
     "callerLabel": "Caller"
   },
+  "report": {
+    "title": "Report this call",
+    "submit": "Submit Report",
+    "submitted": "Reported",
+    "scamTypes": {
+      "delivery": "Delivery",
+      "police_ticket": "Police Ticket",
+      "credit": "Credit",
+      "stolen_identity": "Stolen Identity",
+      "tech_support": "Tech Support",
+      "investment": "Investment / Crypto",
+      "romance_lottery": "Romance / Lottery",
+      "bank_impersonation": "Bank Impersonation",
+      "others": "Others"
+    }
+  },
   "settings": {
     "title": "Settings",
     "sectionProtection": "Protection",
