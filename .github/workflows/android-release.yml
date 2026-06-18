@@ -112,7 +112,7 @@ jobs:
         if: steps.gate.outputs.yes == 'true'
         id: ver
         run: |
-          echo "code=${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "code=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
           echo "name=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       # ── 6. Build release AAB ─────────────────────────────────────────────────
@@ -123,6 +123,9 @@ jobs:
         run: ./gradlew bundleRelease --no-daemon
         env:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=512m"
+          # pnpm symlinks cause react-native/cli.js to resolve from the virtual store
+          # where @react-native-community/cli is not a sibling — NODE_PATH fixes this.
+          NODE_PATH: ${{ github.workspace }}/apps/mobile/node_modules:${{ github.workspace }}/node_modules
           # Version injection (ORG_GRADLE_PROJECT_* → project properties)
           ORG_GRADLE_PROJECT_versionCode: ${{ steps.ver.outputs.code }}
           ORG_GRADLE_PROJECT_versionName: ${{ steps.ver.outputs.name }}

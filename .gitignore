@@ -170,3 +170,4 @@ apps/mobile/Gemfile.lock
 # Generated Play Store assets (not committed � copy manually)
 tools/store-assets/
 my-release.jks
+build-release.ps1

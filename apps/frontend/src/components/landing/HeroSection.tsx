@@ -149,13 +149,23 @@ export function HeroSection() {
 
           {/* CTA buttons */}
           <div id="download" className="flex flex-wrap gap-4 pt-2">
-            <a
-              href="#"
-              className="flex items-center gap-3 px-5 py-3 rounded-xl bg-sky-400 text-navy-900 font-semibold hover:bg-sky-300 transition-colors"
-            >
-              <AndroidIcon />
-              {t("landing.hero.ctaAndroid")}
-            </a>
+            <div className="relative">
+              <a
+                href="https://play.google.com/apps/testing/com.escronet"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-5 py-3 rounded-xl bg-sky-400 text-navy-900 font-semibold hover:bg-sky-300 transition-colors"
+              >
+                <AndroidIcon />
+                <span className="flex flex-col leading-tight">
+                  <span>{t("landing.hero.ctaAndroid")}</span>
+                  <span className="text-xs font-normal opacity-70">{t("landing.hero.ctaAndroidBeta")}</span>
+                </span>
+              </a>
+              <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-yellow-400 text-navy-900 text-[10px] font-bold leading-none">
+                β
+              </span>
+            </div>
             <a
               href="#"
               className="flex items-center gap-3 px-5 py-3 rounded-xl border border-navy-700 text-muted hover:border-sky-400/50 hover:text-white transition-colors cursor-not-allowed"
